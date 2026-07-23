@@ -43,7 +43,28 @@ export default function AssinarContratoPage() {
   const [nome, setNome] = useState('');
   const [aceite, setAceite] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
   const [assinado, setAssinado] = useState<{ hash: string; em: string } | null>(null);
+
+  async function handlePreview() {
+    if (!token) return;
+    setPreviewLoading(true);
+    try {
+      const { data, error } = await supabase.rpc('contrato_preview_url_por_token' as never, {
+        p_token: token,
+      } as never);
+      if (error) throw error;
+      const res = data as unknown as { signed_url: string };
+      if (!res?.signed_url) throw new Error('URL não disponível.');
+      window.open(res.signed_url, '_blank', 'noopener,noreferrer');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Falha ao gerar prévia.';
+      toast.error(msg);
+    } finally {
+      setPreviewLoading(false);
+    }
+  }
+
 
   useEffect(() => {
     let cancel = false;
