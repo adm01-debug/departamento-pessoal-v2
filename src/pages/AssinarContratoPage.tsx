@@ -169,7 +169,7 @@ export default function AssinarContratoPage() {
     );
   }
 
-  if (!info) return null;
+  if (!info) return <></>;
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
