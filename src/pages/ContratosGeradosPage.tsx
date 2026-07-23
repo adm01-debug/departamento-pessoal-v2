@@ -309,6 +309,16 @@ export default function ContratosGeradosPage() {
                               <Download className="h-4 w-4" />
                             </Button>
                           )}
+                          {(c.status === 'gerado' || c.status === 'enviado') && (
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              title="Gerar/reenviar link de assinatura"
+                              onClick={() => void reenviarLink(c.id)}
+                            >
+                              <Send className="h-4 w-4" />
+                            </Button>
+                          )}
                           {c.status === 'assinado' && c.sha256 && (
                             <>
                               <Button
