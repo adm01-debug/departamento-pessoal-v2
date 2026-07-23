@@ -1,14 +1,17 @@
 /**
  * FeriasReconciliacaoHistoricoCard — observabilidade do cron self-healing
- * `reconciliar_ferias_folha_batch` (03:15 BRT). Exibe as últimas execuções
- * e destaca quando ainda restam divergências após a rodada.
+ * `reconciliar_ferias_folha_batch` (03:15 BRT). Exibe as últimas execuções,
+ * KPIs de SLA e alerta visual quando o SLA cai abaixo de 80%.
  */
+import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { History, CheckCircle2, AlertTriangle } from 'lucide-react';
-import { useMemo } from 'react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { History, CheckCircle2, AlertTriangle, ShieldAlert } from 'lucide-react';
 import { useReconciliacaoLogs } from '@/hooks/ferias/useReconciliacaoLogs';
+
+const SLA_ALERT_THRESHOLD = 80;
 
 export function FeriasReconciliacaoHistoricoCard() {
   const { data, isLoading } = useReconciliacaoLogs(10);
@@ -24,6 +27,8 @@ export function FeriasReconciliacaoHistoricoCard() {
     const sla = Math.round((consistentes / total) * 100);
     return { total, consistentes, corrigidas, duracaoMedia, sla };
   }, [data]);
+
+  const slaCritico = resumo !== null && resumo.sla < SLA_ALERT_THRESHOLD;
 
   return (
     <Card>
@@ -42,6 +47,16 @@ export function FeriasReconciliacaoHistoricoCard() {
           </p>
         ) : (
           <>
+            {slaCritico && (
+              <Alert variant="destructive">
+                <ShieldAlert className="h-4 w-4" aria-hidden />
+                <AlertTitle>SLA de reconciliação abaixo do alvo</AlertTitle>
+                <AlertDescription>
+                  Últimas {resumo!.total} execuções fecharam em {resumo!.sla}% (alvo ≥ {SLA_ALERT_THRESHOLD}%).
+                  Investigue os logs com pendências e valide o cron `reconciliar_ferias_folha_batch`.
+                </AlertDescription>
+              </Alert>
+            )}
             <ul className="divide-y">
               {data.slice(0, 5).map((log) => {
                 const ok = log.restantes === 0;
@@ -73,7 +88,9 @@ export function FeriasReconciliacaoHistoricoCard() {
               <div className="mt-3 pt-3 border-t grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                 <div>
                   <p className="text-muted-foreground">SLA (últ. {resumo.total})</p>
-                  <p className="font-semibold text-sm">{resumo.sla}%</p>
+                  <p className={`font-semibold text-sm ${slaCritico ? 'text-destructive' : ''}`}>
+                    {resumo.sla}%
+                  </p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Consistentes</p>
