@@ -132,4 +132,20 @@ export const contratoTemplateService = {
     if (error) throw error;
     return data.signedUrl;
   },
+
+  async gerarTokenAssinatura(
+    contratoId: string,
+    opts: { email?: string; cpf?: string; validadeDias?: number } = {}
+  ): Promise<{ token: string; url: string; expira_em: string }> {
+    const { data, error } = await supabase.rpc('contrato_gerar_token_assinatura' as never, {
+      p_contrato_id: contratoId,
+      p_email: opts.email ?? null,
+      p_cpf: opts.cpf ?? null,
+      p_validade_dias: opts.validadeDias ?? 7,
+    } as never);
+    if (error) throw error;
+    const row = Array.isArray(data) ? (data[0] as { token: string; expira_em: string }) : (data as { token: string; expira_em: string });
+    const url = `${window.location.origin}/assinar-contrato/${row.token}`;
+    return { token: row.token, url, expira_em: row.expira_em };
+  },
 };
