@@ -24959,6 +24959,10 @@ export type Database = {
         }
         Returns: string
       }
+      contrato_verificar_autenticidade: {
+        Args: { p_hash: string }
+        Returns: Json
+      }
       contratos_alertar_vencimentos: { Args: never; Returns: number }
       contratos_enviar_lembretes_assinatura: { Args: never; Returns: number }
       criar_batida_da_divergencia_afdt: {
