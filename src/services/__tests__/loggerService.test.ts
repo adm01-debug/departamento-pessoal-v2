@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { loggerService } from '../loggerService';
 
 const mockRpcResult = { catch: vi.fn() };
-const mockRpc = vi.fn(() => mockRpcResult);
+const mockRpc = vi.fn((_fn: string, _args?: unknown) => mockRpcResult);
 const mockInsert = vi.fn(() => Promise.resolve({ error: null }));
 const mockFrom = vi.fn((_table: string) => ({ insert: mockInsert }));
 
