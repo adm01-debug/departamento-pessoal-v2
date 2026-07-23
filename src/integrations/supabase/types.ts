@@ -5446,6 +5446,82 @@ export type Database = {
           },
         ]
       }
+      contrato_templates: {
+        Row: {
+          ativo: boolean
+          cargo_id: string | null
+          clausulas_condicionais: Json
+          corpo_html: string
+          created_at: string
+          created_by: string | null
+          departamento_id: string | null
+          descricao: string | null
+          empresa_id: string
+          id: string
+          nome: string
+          tipo_contrato: string
+          updated_at: string
+          variaveis_schema: Json
+          versao: number
+        }
+        Insert: {
+          ativo?: boolean
+          cargo_id?: string | null
+          clausulas_condicionais?: Json
+          corpo_html: string
+          created_at?: string
+          created_by?: string | null
+          departamento_id?: string | null
+          descricao?: string | null
+          empresa_id: string
+          id?: string
+          nome: string
+          tipo_contrato: string
+          updated_at?: string
+          variaveis_schema?: Json
+          versao?: number
+        }
+        Update: {
+          ativo?: boolean
+          cargo_id?: string | null
+          clausulas_condicionais?: Json
+          corpo_html?: string
+          created_at?: string
+          created_by?: string | null
+          departamento_id?: string | null
+          descricao?: string | null
+          empresa_id?: string
+          id?: string
+          nome?: string
+          tipo_contrato?: string
+          updated_at?: string
+          variaveis_schema?: Json
+          versao?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contrato_templates_cargo_id_fkey"
+            columns: ["cargo_id"]
+            isOneToOne: false
+            referencedRelation: "cargos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contrato_templates_departamento_id_fkey"
+            columns: ["departamento_id"]
+            isOneToOne: false
+            referencedRelation: "departamentos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contrato_templates_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contratos: {
         Row: {
           colaborador_id: string | null
@@ -5552,6 +5628,113 @@ export type Database = {
             columns: ["empresa_id"]
             isOneToOne: false
             referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contratos_gerados: {
+        Row: {
+          admissao_id: string | null
+          assinado_em: string | null
+          assinatura_metadata: Json | null
+          colaborador_id: string | null
+          created_at: string
+          empresa_id: string
+          gerado_por: string | null
+          html_final: string | null
+          id: string
+          sha256: string | null
+          status: string
+          storage_path: string | null
+          template_id: string
+          template_versao: number
+          updated_at: string
+          variaveis_snapshot: Json
+        }
+        Insert: {
+          admissao_id?: string | null
+          assinado_em?: string | null
+          assinatura_metadata?: Json | null
+          colaborador_id?: string | null
+          created_at?: string
+          empresa_id: string
+          gerado_por?: string | null
+          html_final?: string | null
+          id?: string
+          sha256?: string | null
+          status?: string
+          storage_path?: string | null
+          template_id: string
+          template_versao: number
+          updated_at?: string
+          variaveis_snapshot?: Json
+        }
+        Update: {
+          admissao_id?: string | null
+          assinado_em?: string | null
+          assinatura_metadata?: Json | null
+          colaborador_id?: string | null
+          created_at?: string
+          empresa_id?: string
+          gerado_por?: string | null
+          html_final?: string | null
+          id?: string
+          sha256?: string | null
+          status?: string
+          storage_path?: string | null
+          template_id?: string
+          template_versao?: number
+          updated_at?: string
+          variaveis_snapshot?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contratos_gerados_admissao_id_fkey"
+            columns: ["admissao_id"]
+            isOneToOne: false
+            referencedRelation: "admissoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_gerados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_gerados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_cadastro_incompleto"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_gerados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_colaboradores_completo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_gerados_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_passivo_trabalhista_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
+            foreignKeyName: "contratos_gerados_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contratos_gerados_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "contrato_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -24324,6 +24507,14 @@ export type Database = {
           p_holerite_id: string
         }
         Returns: number
+      }
+      contrato_montar_variaveis: {
+        Args: { p_admissao_id: string }
+        Returns: Json
+      }
+      contrato_resolver_template: {
+        Args: { p_admissao_id: string }
+        Returns: string
       }
       criar_batida_da_divergencia_afdt: {
         Args: { _divergencia_id: string; _tipo?: string }
