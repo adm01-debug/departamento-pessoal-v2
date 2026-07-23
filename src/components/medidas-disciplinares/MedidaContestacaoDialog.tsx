@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
 import { MedidaWorkflowTimeline } from './MedidaWorkflowTimeline';
 import { MedidaIntegracaoCard } from './MedidaIntegracaoCard';
+import { MedidaEsocialCard } from './MedidaEsocialCard';
 import { AlertTriangle, Clock, Paperclip, Upload, Download, FileText, Check, X } from 'lucide-react';
 import { format, parseISO, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -205,6 +206,7 @@ export function MedidaContestacaoDialog({ medida, open, onOpenChange, isRHOrAdmi
         <Separator />
         <MedidaWorkflowTimeline medidaId={medida.id} />
         <MedidaIntegracaoCard medidaId={medida.id} tipo={medida.tipo} statusWorkflow={medida.status_workflow} />
+        <MedidaEsocialCard medidaId={medida.id} tipo={medida.tipo} statusWorkflow={medida.status_workflow} />
 
         <DialogFooter className="gap-2">
           <Button variant="ghost" onClick={() => onOpenChange(false)}>Fechar</Button>
