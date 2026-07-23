@@ -16,11 +16,16 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_ANON = (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
   import.meta.env.VITE_SUPABASE_ANON_KEY) as string;
 
-const anon = createClient(SUPABASE_URL, SUPABASE_ANON, {
-  auth: { persistSession: false, autoRefreshToken: false },
-});
+// Smoke test de integração: exige backend real (URL + anon key). Sem essas
+// variáveis (ex.: CI sem secrets), o suite é pulado em vez de quebrar no import.
+const hasBackend = Boolean(SUPABASE_URL && SUPABASE_ANON);
+const anon = hasBackend
+  ? createClient(SUPABASE_URL, SUPABASE_ANON, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    })
+  : (null as unknown as ReturnType<typeof createClient>);
 
-describe('RPC permissions — anon role', () => {
+describe.skipIf(!hasBackend)('RPC permissions — anon role', () => {
   it('check_login_lock continua acessível sem sessão', async () => {
     const { error } = await anon.rpc('check_login_lock', {
       p_identifier: 'test@example.com',
@@ -57,7 +62,7 @@ describe('RPC permissions — anon role', () => {
   });
 });
 
-describe('RLS — anon não enxerga dados de tenants', () => {
+describe.skipIf(!hasBackend)('RLS — anon não enxerga dados de tenants', () => {
   it.each([
     'colaboradores',
     'folhas_pagamento',
