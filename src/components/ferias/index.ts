@@ -11,3 +11,4 @@ export * from './FeriasAuditTimeline';
 export * from './FeriasSaldoReport';
 export * from './FeriasRelatorioDialog';
 export * from './FeriasAlertasPagamentoCard';
+export * from './FeriasReconciliacaoCard';
