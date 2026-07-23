@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion } from 'framer-motion';
-import { Trash2, Users, FileText, CheckCircle2, XCircle, Eye, ExternalLink, AlertTriangle, FileDown, Loader2 } from 'lucide-react';
+import { Trash2, Users, FileText, CheckCircle2, XCircle, Eye, ExternalLink, AlertTriangle, FileDown, Loader2, MessageSquareWarning } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { safeHref } from '@/utils/safeUrl';
@@ -43,10 +43,11 @@ interface MedidasTableProps {
   onMarcarCiencia: (id: string) => void;
   onExcluir: (id: string) => void;
   onGerarPDF?: (id: string) => void;
+  onAbrirContestacao?: (m: any) => void;
   gerandoPDFId?: string | null;
 }
 
-export function MedidasTable({ data, onMarcarCiencia, onExcluir, onGerarPDF, gerandoPDFId }: MedidasTableProps) {
+export function MedidasTable({ data, onMarcarCiencia, onExcluir, onGerarPDF, onAbrirContestacao, gerandoPDFId }: MedidasTableProps) {
   const formatDate = (d: string) => {
     try { return format(parseISO(d), 'dd/MM/yyyy', { locale: ptBR }); } catch { return d; }
   };

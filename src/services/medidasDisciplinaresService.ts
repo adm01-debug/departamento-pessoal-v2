@@ -124,4 +124,57 @@ export const medidasDisciplinaresService = {
     if (error) throw error;
     return data ?? [];
   },
+
+  // ============ Contestação ============
+  async contestar(medidaId: string, texto: string) {
+    const { data, error } = await (supabase as any).rpc('medida_contestar', {
+      _medida_id: medidaId, _texto: texto,
+    });
+    if (error) throw error;
+    return data;
+  },
+  async responderContestacao(medidaId: string, resposta: string, aceita: boolean) {
+    const { data, error } = await (supabase as any).rpc('medida_responder_contestacao', {
+      _medida_id: medidaId, _resposta: resposta, _aceita: aceita,
+    });
+    if (error) throw error;
+    return data;
+  },
+  async uploadAnexoContestacao(medidaId: string, empresaId: string, file: File) {
+    const path = `${empresaId}/${medidaId}/${crypto.randomUUID()}-${file.name}`;
+    const { error: upErr } = await supabase.storage
+      .from('medidas-contestacoes')
+      .upload(path, file, { upsert: false, contentType: file.type });
+    if (upErr) throw upErr;
+
+    const buf = await file.arrayBuffer();
+    const hashBuf = await crypto.subtle.digest('SHA-256', buf);
+    const hash = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+    const { data: userData } = await supabase.auth.getUser();
+    const { data, error } = await (supabase as any)
+      .from('medidas_disciplinares_contestacao_anexos')
+      .insert({
+        medida_id: medidaId, empresa_id: empresaId,
+        storage_path: path, nome_arquivo: file.name,
+        mime_type: file.type, tamanho_bytes: file.size, hash_sha256: hash,
+        uploaded_by: userData.user?.id ?? null,
+      })
+      .select().maybeSingle();
+    if (error) throw error;
+    return data;
+  },
+  async listarAnexosContestacao(medidaId: string) {
+    const { data, error } = await (supabase as any)
+      .from('medidas_disciplinares_contestacao_anexos')
+      .select('*').eq('medida_id', medidaId).order('created_at', { ascending: false });
+    if (error) throw error;
+    return data ?? [];
+  },
+  async signedUrlAnexoContestacao(path: string, expiresIn = 3600) {
+    const { data, error } = await supabase.storage
+      .from('medidas-contestacoes').createSignedUrl(path, expiresIn);
+    if (error) throw error;
+    return data.signedUrl;
+  },
 };

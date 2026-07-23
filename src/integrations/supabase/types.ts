@@ -13240,7 +13240,12 @@ export type Database = {
           assinado_em: string | null
           colaborador_ciente: boolean | null
           colaborador_id: string
+          contestacao_aceita: boolean | null
           contestacao_data: string | null
+          contestacao_prazo_ate: string | null
+          contestacao_prazo_horas: number
+          contestacao_respondida_em: string | null
+          contestacao_respondida_por: string | null
           contestacao_resposta: string | null
           contestacao_texto: string | null
           created_at: string | null
@@ -13294,7 +13299,12 @@ export type Database = {
           assinado_em?: string | null
           colaborador_ciente?: boolean | null
           colaborador_id: string
+          contestacao_aceita?: boolean | null
           contestacao_data?: string | null
+          contestacao_prazo_ate?: string | null
+          contestacao_prazo_horas?: number
+          contestacao_respondida_em?: string | null
+          contestacao_respondida_por?: string | null
           contestacao_resposta?: string | null
           contestacao_texto?: string | null
           created_at?: string | null
@@ -13348,7 +13358,12 @@ export type Database = {
           assinado_em?: string | null
           colaborador_ciente?: boolean | null
           colaborador_id?: string
+          contestacao_aceita?: boolean | null
           contestacao_data?: string | null
+          contestacao_prazo_ate?: string | null
+          contestacao_prazo_horas?: number
+          contestacao_respondida_em?: string | null
+          contestacao_respondida_por?: string | null
           contestacao_resposta?: string | null
           contestacao_texto?: string | null
           created_at?: string | null
@@ -13500,6 +13515,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "medidas_disciplinares_anexos_medida_id_fkey"
+            columns: ["medida_id"]
+            isOneToOne: false
+            referencedRelation: "medidas_disciplinares"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medidas_disciplinares_contestacao_anexos: {
+        Row: {
+          created_at: string
+          empresa_id: string
+          hash_sha256: string | null
+          id: string
+          medida_id: string
+          mime_type: string | null
+          nome_arquivo: string
+          storage_path: string
+          tamanho_bytes: number | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          empresa_id: string
+          hash_sha256?: string | null
+          id?: string
+          medida_id: string
+          mime_type?: string | null
+          nome_arquivo: string
+          storage_path: string
+          tamanho_bytes?: number | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          empresa_id?: string
+          hash_sha256?: string | null
+          id?: string
+          medida_id?: string
+          mime_type?: string | null
+          nome_arquivo?: string
+          storage_path?: string
+          tamanho_bytes?: number | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medidas_disciplinares_contestacao_anexos_medida_id_fkey"
             columns: ["medida_id"]
             isOneToOne: false
             referencedRelation: "medidas_disciplinares"
@@ -24255,10 +24317,146 @@ export type Database = {
         Args: { _medida_id: string; _observacao?: string }
         Returns: Json
       }
+      medida_contestar: {
+        Args: { _medida_id: string; _texto: string }
+        Returns: {
+          aplicado_por: string | null
+          aprovado_gestor_em: string | null
+          aprovado_gestor_por: string | null
+          aprovado_juridico_em: string | null
+          aprovado_juridico_por: string | null
+          aprovado_rh_em: string | null
+          aprovado_rh_por: string | null
+          aprovador_id: string | null
+          arquivado_em: string | null
+          arquivado_por: string | null
+          artigo_clt: string | null
+          assinado_em: string | null
+          colaborador_ciente: boolean | null
+          colaborador_id: string
+          contestacao_aceita: boolean | null
+          contestacao_data: string | null
+          contestacao_prazo_ate: string | null
+          contestacao_prazo_horas: number
+          contestacao_respondida_em: string | null
+          contestacao_respondida_por: string | null
+          contestacao_resposta: string | null
+          contestacao_texto: string | null
+          created_at: string | null
+          data_aprovacao: string | null
+          data_ciencia: string | null
+          data_conhecimento_fato: string | null
+          data_ocorrencia: string
+          descricao: string
+          dias_suspensao: number | null
+          documento_url: string | null
+          empresa_id: string | null
+          evidenciado_por: Json | null
+          gravidade: string | null
+          hash_integridade: string | null
+          id: string
+          id_registro_anterior: string | null
+          motivo_recusa: string | null
+          motivo_rejeicao: string | null
+          numero_sequencial: number | null
+          pdf_gerado_em: string | null
+          pdf_hash_sha256: string | null
+          pdf_url: string | null
+          prazo_ciencia_dias: number | null
+          recorrencia_infrafacao: boolean | null
+          recusa_assinatura: boolean | null
+          rejeitado_em: string | null
+          rejeitado_por: string | null
+          status: string | null
+          status_workflow: string | null
+          testemunha_1: string | null
+          testemunha_1_cpf: string | null
+          testemunha_1_nome: string | null
+          testemunha_2: string | null
+          testemunha_2_cpf: string | null
+          testemunha_2_nome: string | null
+          tipo: string
+          updated_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "medidas_disciplinares"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       medida_enviar_aprovacao: { Args: { _medida_id: string }; Returns: Json }
       medida_rejeitar: {
         Args: { _medida_id: string; _motivo: string }
         Returns: Json
+      }
+      medida_responder_contestacao: {
+        Args: { _aceita: boolean; _medida_id: string; _resposta: string }
+        Returns: {
+          aplicado_por: string | null
+          aprovado_gestor_em: string | null
+          aprovado_gestor_por: string | null
+          aprovado_juridico_em: string | null
+          aprovado_juridico_por: string | null
+          aprovado_rh_em: string | null
+          aprovado_rh_por: string | null
+          aprovador_id: string | null
+          arquivado_em: string | null
+          arquivado_por: string | null
+          artigo_clt: string | null
+          assinado_em: string | null
+          colaborador_ciente: boolean | null
+          colaborador_id: string
+          contestacao_aceita: boolean | null
+          contestacao_data: string | null
+          contestacao_prazo_ate: string | null
+          contestacao_prazo_horas: number
+          contestacao_respondida_em: string | null
+          contestacao_respondida_por: string | null
+          contestacao_resposta: string | null
+          contestacao_texto: string | null
+          created_at: string | null
+          data_aprovacao: string | null
+          data_ciencia: string | null
+          data_conhecimento_fato: string | null
+          data_ocorrencia: string
+          descricao: string
+          dias_suspensao: number | null
+          documento_url: string | null
+          empresa_id: string | null
+          evidenciado_por: Json | null
+          gravidade: string | null
+          hash_integridade: string | null
+          id: string
+          id_registro_anterior: string | null
+          motivo_recusa: string | null
+          motivo_rejeicao: string | null
+          numero_sequencial: number | null
+          pdf_gerado_em: string | null
+          pdf_hash_sha256: string | null
+          pdf_url: string | null
+          prazo_ciencia_dias: number | null
+          recorrencia_infrafacao: boolean | null
+          recusa_assinatura: boolean | null
+          rejeitado_em: string | null
+          rejeitado_por: string | null
+          status: string | null
+          status_workflow: string | null
+          testemunha_1: string | null
+          testemunha_1_cpf: string | null
+          testemunha_1_nome: string | null
+          testemunha_2: string | null
+          testemunha_2_cpf: string | null
+          testemunha_2_nome: string | null
+          tipo: string
+          updated_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "medidas_disciplinares"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       next_cnab_sequencial: {
         Args: { p_banco_codigo: string; p_empresa_id: string }
