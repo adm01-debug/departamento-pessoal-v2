@@ -126,8 +126,8 @@ export default function DescontosPage() {
         </div>
 
         <FinancialSummaryCards 
-          emprestimos={emprestimos} 
-          adiantamentos={adiantamentos} 
+          emprestimos={emprestimos as any} 
+          adiantamentos={adiantamentos as any} 
           fmt={fmt} 
         />
 
