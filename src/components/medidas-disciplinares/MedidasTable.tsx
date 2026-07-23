@@ -197,6 +197,16 @@ export function MedidasTable({ data, onMarcarCiencia, onExcluir, onGerarPDF, onA
                             <TooltipContent>{m.pdf_url ? 'Regerar documento assinável' : 'Gerar documento assinável (PDF)'}</TooltipContent>
                           </Tooltip>
                         )}
+                        {onAbrirContestacao && ['aplicada','contestada'].includes(m.status_workflow) && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg" onClick={() => onAbrirContestacao(m)} aria-label="Contestação">
+                                <MessageSquareWarning className={`h-3.5 w-3.5 ${m.status_workflow === 'contestada' ? 'text-warning' : 'text-muted-foreground'}`} />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>{m.status_workflow === 'contestada' ? 'Contestação pendente de resposta' : 'Ver / contestar'}</TooltipContent>
+                          </Tooltip>
+                        )}
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg" onClick={() => onExcluir(m.id)}>
