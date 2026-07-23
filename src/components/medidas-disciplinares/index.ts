@@ -8,3 +8,4 @@ export { MedidaContestacaoDialog } from './MedidaContestacaoDialog';
 export { MedidaIntegracaoCard } from './MedidaIntegracaoCard';
 export { MedidaEsocialCard } from './MedidaEsocialCard';
 export { MedidasAnalytics } from './MedidasAnalytics';
+export { MedidaCienciaDigitalCard } from './MedidaCienciaDigitalCard';
