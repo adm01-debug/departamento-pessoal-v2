@@ -24570,6 +24570,14 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      medidas_analytics_reincidencia: {
+        Args: {
+          p_data_fim: string
+          p_data_inicio: string
+          p_empresa_id: string
+        }
+        Returns: Json
+      }
       next_cnab_sequencial: {
         Args: { p_banco_codigo: string; p_empresa_id: string }
         Returns: number
