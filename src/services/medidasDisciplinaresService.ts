@@ -84,4 +84,44 @@ export const medidasDisciplinaresService = {
     if (error) throw error;
     return data.signedUrl;
   },
+
+  // ============ Workflow CLT ============
+  async enviarAprovacao(medidaId: string) {
+    const { data, error } = await (supabase as any).rpc('medida_enviar_aprovacao', { _medida_id: medidaId });
+    if (error) throw error;
+    return data;
+  },
+  async aprovar(medidaId: string, observacao?: string) {
+    const { data, error } = await (supabase as any).rpc('medida_aprovar', {
+      _medida_id: medidaId,
+      _observacao: observacao ?? null,
+    });
+    if (error) throw error;
+    return data;
+  },
+  async rejeitar(medidaId: string, motivo: string) {
+    const { data, error } = await (supabase as any).rpc('medida_rejeitar', {
+      _medida_id: medidaId,
+      _motivo: motivo,
+    });
+    if (error) throw error;
+    return data;
+  },
+  async arquivar(medidaId: string, observacao?: string) {
+    const { data, error } = await (supabase as any).rpc('medida_arquivar', {
+      _medida_id: medidaId,
+      _observacao: observacao ?? null,
+    });
+    if (error) throw error;
+    return data;
+  },
+  async listarHistorico(medidaId: string) {
+    const { data, error } = await (supabase as any)
+      .from('medidas_disciplinares_workflow_log')
+      .select('*')
+      .eq('medida_id', medidaId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data ?? [];
+  },
 };
