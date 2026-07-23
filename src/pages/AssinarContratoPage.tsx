@@ -36,6 +36,8 @@ export default function AssinarContratoPage() {
   const [loading, setLoading] = useState(true);
   const [info, setInfo] = useState<ContratoInfo | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const [erroTipo, setErroTipo] = useState<'revogado' | 'expirado' | 'usado' | 'invalido' | 'generico' | null>(null);
+
 
   const [cpf, setCpf] = useState('');
   const [nome, setNome] = useState('');
