@@ -3462,6 +3462,33 @@ export type Database = {
         }
         Relationships: []
       }
+      ciencia_rate_limits: {
+        Row: {
+          created_at: string
+          id: string
+          identifier: string | null
+          ip_address: unknown
+          rpc_name: string
+          success: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          identifier?: string | null
+          ip_address: unknown
+          rpc_name: string
+          success?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          identifier?: string | null
+          ip_address?: unknown
+          rpc_name?: string
+          success?: boolean
+        }
+        Relationships: []
+      }
       clinicas_partners: {
         Row: {
           aceita_convenio: boolean
@@ -24235,6 +24262,15 @@ export type Database = {
         Args: { check_email: string; check_ip: string }
         Returns: Json
       }
+      check_ciencia_rate_limit: {
+        Args: {
+          p_identifier?: string
+          p_max_requests?: number
+          p_rpc_name: string
+          p_window_minutes?: number
+        }
+        Returns: boolean
+      }
       check_idempotency_anomalies: {
         Args: never
         Returns: {
@@ -24258,6 +24294,7 @@ export type Database = {
         }
         Returns: Json
       }
+      cleanup_ciencia_rate_limits: { Args: never; Returns: undefined }
       cleanup_security_logs: { Args: never; Returns: undefined }
       clinicas_proximas: {
         Args: {
