@@ -24088,6 +24088,7 @@ export type Database = {
         }[]
       }
       notificar_ferias_pagamento_d5: { Args: never; Returns: number }
+      notificar_ferias_reconciliacao_sla_baixo: { Args: never; Returns: Json }
       pagar_desligamento: {
         Args: { _comprovante_url?: string; _desligamento_id: string }
         Returns: {
