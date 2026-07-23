@@ -177,4 +177,17 @@ export const medidasDisciplinaresService = {
     if (error) throw error;
     return data.signedUrl;
   },
+  async listarIntegracao(medidaId: string): Promise<any[]> {
+    // Log de integração medida -> folha/ponto (backend em construção; degrada para vazio)
+    const { data } = await (supabase.from('medida_integracao_log') as any)
+      .select('*')
+      .eq('medida_id', medidaId)
+      .order('created_at', { ascending: false });
+    return data ?? [];
+  },
+  async aplicarIntegracao(medidaId: string): Promise<any> {
+    const { data, error } = await supabase.rpc('aplicar_integracao_medida' as any, { p_medida_id: medidaId } as any);
+    if (error) throw error;
+    return data;
+  },
 };
