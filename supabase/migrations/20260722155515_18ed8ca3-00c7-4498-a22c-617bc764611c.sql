@@ -30,23 +30,53 @@ SELECT
 FROM public.audit_logs
 ON CONFLICT (source_table, source_id) WHERE source_id IS NOT NULL DO NOTHING;
 
--- auditoria (empresa_id é uuid nessa tabela; cast para text apenas no regex)
-INSERT INTO public.audit_log_unified
-  (source_table, source_id, empresa_id, user_id, action, entity, entity_id, payload, ip_address, occurred_at)
-SELECT
-  'auditoria', id,
-  CASE WHEN empresa_id::text ~ '^[0-9a-f-]{36}$' THEN empresa_id ELSE NULL END,
-  usuario_id, acao, entidade, entidade_id,
-  jsonb_build_object(
-    'usuario_nome', usuario_nome,
-    'descricao', descricao,
-    'dados_anteriores', dados_anteriores,
-    'dados_novos', dados_novos,
-    'empresa_id_raw', empresa_id
-  ),
-  NULLIF(ip_address, '')::inet, created_at
-FROM public.auditoria
-ON CONFLICT (source_table, source_id) WHERE source_id IS NOT NULL DO NOTHING;
+-- auditoria (schema-adaptive: 005_esocial_auditoria vs 20260306 têm layouts diferentes)
+-- 005 schema: empresa_id uuid, tabela+registro_id, sem entidade/descricao
+-- 20260306 schema: empresa_id text, entidade+entidade_id+descricao
+DO $$
+DECLARE
+  has_entidade BOOLEAN;
+BEGIN
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'auditoria' AND column_name = 'entidade'
+  ) INTO has_entidade;
+
+  IF has_entidade THEN
+    INSERT INTO public.audit_log_unified
+      (source_table, source_id, empresa_id, user_id, action, entity, entity_id, payload, ip_address, occurred_at)
+    SELECT
+      'auditoria', id,
+      CASE WHEN empresa_id::text ~ '^[0-9a-f-]{36}$' THEN empresa_id::text::uuid ELSE NULL END,
+      usuario_id, acao, entidade, entidade_id,
+      jsonb_build_object(
+        'usuario_nome', usuario_nome,
+        'descricao', descricao,
+        'dados_anteriores', dados_anteriores,
+        'dados_novos', dados_novos,
+        'empresa_id_raw', empresa_id
+      ),
+      NULLIF(ip_address, '')::inet, created_at
+    FROM public.auditoria
+    ON CONFLICT (source_table, source_id) WHERE source_id IS NOT NULL DO NOTHING;
+  ELSE
+    -- Schema antigo (005_esocial_auditoria): empresa_id uuid, tabela+registro_id em vez de entidade
+    INSERT INTO public.audit_log_unified
+      (source_table, source_id, empresa_id, user_id, action, entity, entity_id, payload, ip_address, occurred_at)
+    SELECT
+      'auditoria', id,
+      empresa_id,
+      usuario_id, acao, tabela, registro_id::text,
+      jsonb_build_object(
+        'usuario_nome', usuario_nome,
+        'dados_anteriores', dados_anteriores,
+        'dados_novos', dados_novos
+      ),
+      NULLIF(ip_address, '')::inet, created_at
+    FROM public.auditoria
+    ON CONFLICT (source_table, source_id) WHERE source_id IS NOT NULL DO NOTHING;
+  END IF;
+END $$;
 
 -- auditoria_logs
 INSERT INTO public.audit_log_unified
