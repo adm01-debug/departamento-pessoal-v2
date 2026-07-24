@@ -35,7 +35,7 @@ INSERT INTO public.audit_log_unified
   (source_table, source_id, empresa_id, user_id, action, entity, entity_id, payload, ip_address, occurred_at)
 SELECT
   'auditoria', id,
-  CASE WHEN empresa_id ~ '^[0-9a-f-]{36}$' THEN empresa_id::uuid ELSE NULL END,
+  CASE WHEN empresa_id::text ~ '^[0-9a-f-]{36}$' THEN empresa_id::uuid ELSE NULL END,
   usuario_id, acao, entidade, entidade_id,
   jsonb_build_object(
     'usuario_nome', usuario_nome,
