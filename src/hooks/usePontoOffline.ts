@@ -1,14 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import { pontoOfflineService } from '@/services/pontoOfflineService';
 
 export function usePontoOffline() {
   const [queueSize, setQueueSize] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
+  const isSyncingRef = useRef(false);
 
-  const updateSize = () => {
+  const updateSize = useCallback(() => {
     setQueueSize(pontoOfflineService.getQueueSize());
-  };
+  }, []);
 
   useEffect(() => {
     updateSize();
@@ -19,7 +20,7 @@ export function usePontoOffline() {
       window.removeEventListener('storage', updateSize);
       window.removeEventListener('ponto-offline-updated', updateSize);
     };
-  }, []);
+  }, [updateSize]);
 
   const addOffline = async (tipo: any, colaboradorId: string, geo: any) => {
     try {
@@ -40,14 +41,13 @@ export function usePontoOffline() {
     }
   };
 
-  const sync = async () => {
-    if (isSyncing || !navigator.onLine) return;
-    
+  const sync = useCallback(async () => {
+    if (isSyncingRef.current || !navigator.onLine) return;
+    isSyncingRef.current = true;
     setIsSyncing(true);
     try {
       const result = await pontoOfflineService.syncOfflineQueue();
-      updateSize();
-      
+      setQueueSize(pontoOfflineService.getQueueSize());
       if (result.synced > 0) {
         toast.success(`${result.synced} batida(s) offline sincronizada(s) com sucesso!`);
       }
@@ -57,9 +57,10 @@ export function usePontoOffline() {
     } catch (error) {
       console.error('Erro durante sincronização de ponto:', error);
     } finally {
+      isSyncingRef.current = false;
       setIsSyncing(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const handleOnline = () => sync();

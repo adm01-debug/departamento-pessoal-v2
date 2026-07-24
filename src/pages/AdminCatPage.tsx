@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -75,7 +75,7 @@ export default function AdminCatPage() {
 
   const empresaId = empresaAtual?.id;
 
-  const carregar = async () => {
+  const carregar = useCallback(async () => {
     if (!empresaId) return;
     setLoading(true);
     try {
@@ -98,9 +98,9 @@ export default function AdminCatPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [empresaId]);
 
-  useEffect(() => { void carregar(); }, [empresaId]);
+  useEffect(() => { void carregar(); }, [carregar]);
 
   const onSubmit = async (values: CatForm) => {
     if (!empresaId) return;

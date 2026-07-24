@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { FileSignature, ShieldCheck, ShieldAlert, Loader2 } from "lucide-react";
+import { todayLocalISO } from "@/utils/dateLocal";
 
 interface Props {
   colaboradorId: string;
@@ -51,7 +52,7 @@ export function AssinarEspelhoDialog({
 }: Props) {
   const [open, setOpen] = useState(false);
   const [competencia, setCompetencia] = useState(
-    competenciaPadrao ?? new Date().toISOString().slice(0, 7),
+    competenciaPadrao ?? todayLocalISO().slice(0, 7),
   );
   const [loading, setLoading] = useState(false);
   const [verificando, setVerificando] = useState(false);

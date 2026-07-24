@@ -13,13 +13,14 @@ export function LockoutMessage({ remainingSeconds }: LockoutMessageProps) {
     setSeconds(remainingSeconds);
   }, [remainingSeconds]);
 
+  const isActive = seconds > 0;
   useEffect(() => {
-    if (seconds <= 0) return;
+    if (!isActive) return;
     const timer = setInterval(() => {
       setSeconds((s) => Math.max(0, s - 1));
     }, 1000);
     return () => clearInterval(timer);
-  }, [seconds > 0]);
+  }, [isActive]);
 
   const minutes = Math.floor(seconds / 60);
   const secs = seconds % 60;

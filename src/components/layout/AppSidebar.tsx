@@ -251,7 +251,7 @@ const ColaboradoresCount = memo(function ColaboradoresCount() {
 
 const SecurityAlertsCount = memo(function SecurityAlertsCount() {
   const queryClient = useQueryClient();
-  const queryKey = ['sidebar-security-alerts-count'];
+  const queryKey = useMemo(() => ['sidebar-security-alerts-count'], []);
 
   const { data: count } = useQuery({
     queryKey,
@@ -286,7 +286,7 @@ const SecurityAlertsCount = memo(function SecurityAlertsCount() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [queryClient]);
+  }, [queryClient, queryKey]);
 
   if (!count) return null;
 

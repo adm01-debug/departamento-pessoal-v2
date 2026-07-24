@@ -38,10 +38,10 @@ export function ImportarAFDTDialog() {
     if (!resultado?.importacao_id) return;
     setReconciliando(true);
     try {
-      const { data, error } = await supabase.rpc('reconciliar_afdt' as never, {
+      const { data, error } = await supabase.rpc('reconciliar_afdt', {
         _importacao_id: resultado.importacao_id,
         _janela_seg: 300,
-      } as never);
+      });
       if (error) throw error;
       const row = Array.isArray(data) ? (data[0] as any) : (data as any);
       setReconc({
@@ -55,8 +55,8 @@ export function ImportarAFDTDialog() {
       const divergenciasTotais = (row?.sem_colaborador ?? 0) + (row?.sem_batida ?? 0);
       if (divergenciasTotais > 0) {
         const { data: notif, error: notifErr } = await supabase.rpc(
-          'notificar_divergencias_afdt' as never,
-          { _importacao_id: resultado.importacao_id } as never,
+          'notificar_divergencias_afdt',
+          { _importacao_id: resultado.importacao_id },
         );
         if (!notifErr && notif) {
           const n = Array.isArray(notif) ? (notif[0] as any) : (notif as any);

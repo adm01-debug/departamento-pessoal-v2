@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { Loader2, FileText, ShieldCheck, Users, CheckCircle2, Plus, Send, Bell, UserX, Download } from 'lucide-react';
+import { todayLocalISO } from '@/utils/dateLocal';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 type Documento = {
@@ -252,7 +253,7 @@ const AdminRegimentoInternoPage = () => {
               const url = URL.createObjectURL(blob);
               const a = document.createElement('a');
               a.href = url;
-              a.download = `regimento-pendentes-${new Date().toISOString().slice(0,10)}.csv`;
+              a.download = `regimento-pendentes-${todayLocalISO()}.csv`;
               a.click();
               URL.revokeObjectURL(url);
             }}

@@ -61,6 +61,7 @@ export function EmpresaProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useEmpresa() {
   const context = useContext(EmpresaContext);
   if (!context) throw new Error('useEmpresa must be used within EmpresaProvider');

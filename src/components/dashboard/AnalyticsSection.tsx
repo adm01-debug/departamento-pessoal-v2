@@ -44,6 +44,7 @@ import { useRealTimeSubscription } from '@/hooks/useRealTimeSubscription';
  * arquivo e permite reuso/teste isolado. Re-exportados aqui para preservar
  * qualquer import antigo que aponte para `AnalyticsSection`.
  */
+/* eslint-disable react-refresh/only-export-components */
 export {
   MotionCard,
   donutColors,
@@ -54,6 +55,7 @@ export {
   CadastroIncompletoWidget,
   ESocialMonitorWidget,
 } from './analytics/widgets';
+/* eslint-enable react-refresh/only-export-components */
 import {
   MotionCard,
   donutColors,

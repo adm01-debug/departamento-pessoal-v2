@@ -146,7 +146,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(authInitTimeout);
       subscription.unsubscribe();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- isReady is read inside the timeout guard but must NOT re-trigger the subscription setup when it flips
   }, [applySession, markReady]);
 
 
@@ -217,6 +216,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) throw new Error('useAuth must be used within AuthProvider');

@@ -41,6 +41,7 @@ export function useGenericCrud<T>({
   // Reset page on search or filter change
   useEffect(() => {
     setPage(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, JSON.stringify(filters)]);
 
   const query = useQuery({
