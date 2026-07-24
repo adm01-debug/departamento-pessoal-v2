@@ -21,20 +21,20 @@ describe('calculoFerias', () => {
     expect(result.bruto).toBe(4000);
     
     // INSS 2026 (Progressivo)
-    // 1518 * 0.075 = 113.85
-    // (2793.88 - 1518) * 0.09 = 1275.88 * 0.09 = 114.83
-    // (4000 - 2793.88) * 0.12 = 1206.12 * 0.12 = 144.73
-    // Total INSS: 113.85 + 114.83 + 144.73 = 373.41
-    expect(result.inss).toBe(373.41);
-    
+    // 1621 * 0.075 = 121.575
+    // (2793.88 - 1621) * 0.09 = 1172.88 * 0.09 = 105.5592
+    // (4000 - 2793.88) * 0.12 = 1206.12 * 0.12 = 144.7344
+    // Total INSS: 121.575 + 105.5592 + 144.7344 = 371.8686 → rounds to 371.87
+    expect(result.inss).toBe(371.87);
+
     // IRRF — usa a base mais benéfica (desconto simplificado vs. deduções legais).
-    // Base legal:        4000 - 373.41 (INSS) = 3626.59 → imposto 162.55
+    // Base legal:        4000 - 371.87 (INSS) = 3628.13 → imposto 162.78
     // Base simplificada: 4000 - 564.80 (desconto) = 3435.20 → imposto 133.84
     // A Receita aplica a MENOR (133.84), conforme regra 2026.
     expect(result.irrf).toBe(133.84);
 
-    // Líquido: 4000 - 373.41 - 133.84 = 3492.75
-    expect(result.liquido).toBe(3492.75);
+    // Líquido: 4000 - 371.87 - 133.84 = 3494.29
+    expect(result.liquido).toBe(3494.29);
   });
 
   it('deve calcular férias com abono pecuniário (20 dias férias + 10 dias abono)', () => {

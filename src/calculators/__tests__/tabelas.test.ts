@@ -19,8 +19,8 @@ describe('tabelas 2026 — integridade dos dados', () => {
       expect(SALARIO_MINIMO_2026).toBeGreaterThan(0);
     });
 
-    it('SALARIO_MINIMO_2026 vale R$ 1.518,00', () => {
-      expect(SALARIO_MINIMO_2026).toBe(1518.00);
+    it('SALARIO_MINIMO_2026 vale R$ 1.621,00', () => {
+      expect(SALARIO_MINIMO_2026).toBe(1621.00);
     });
   });
 

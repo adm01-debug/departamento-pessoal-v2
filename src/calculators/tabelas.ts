@@ -1,9 +1,9 @@
 // Tabelas e constantes trabalhistas 2026
 
-export const SALARIO_MINIMO_2026 = 1518.00;
+export const SALARIO_MINIMO_2026 = 1621.00;
 
 export const FAIXAS_INSS_2026 = [
-  { limite: 1518.00, aliquota: 0.075 },
+  { limite: 1621.00, aliquota: 0.075 },
   { limite: 2793.88, aliquota: 0.09 },
   { limite: 4190.83, aliquota: 0.12 },
   { limite: 8157.41, aliquota: 0.14 },

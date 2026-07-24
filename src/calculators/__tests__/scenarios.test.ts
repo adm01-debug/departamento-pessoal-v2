@@ -49,10 +49,10 @@ describe('Simulação — INSS (progressivo 2026, teto R$ 8.157,41)', () => {
   it('piso (salário mínimo 1518) => 113,85', () => {
     expect(calcularINSS(1518)).toBeCloseTo(113.85, 2);
   });
-  it('teto e acima => contribuição máxima 951,63', () => {
-    expect(calcularINSS(8157.41)).toBeCloseTo(951.63, 2);
-    expect(calcularINSS(20000)).toBeCloseTo(951.63, 2);
-    expect(calcularINSS(1_000_000)).toBeCloseTo(951.63, 2);
+  it('teto e acima => contribuição máxima 950,09', () => {
+    expect(calcularINSS(8157.41)).toBeCloseTo(950.09, 2);
+    expect(calcularINSS(20000)).toBeCloseTo(950.09, 2);
+    expect(calcularINSS(1_000_000)).toBeCloseTo(950.09, 2);
   });
   it('nunca excede o teto de contribuição e é monotônico não-decrescente', () => {
     let anterior = 0;

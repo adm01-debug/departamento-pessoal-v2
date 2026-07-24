@@ -35,7 +35,7 @@ jobs:
         run: bun run typecheck
 
       - name: Lint
-        run: bun run lint
+        run: bun run lint:ci
 
       - name: Unit Tests
         run: bun run test:coverage
