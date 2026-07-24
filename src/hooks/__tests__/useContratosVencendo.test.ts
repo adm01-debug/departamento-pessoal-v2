@@ -1,21 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
-const { mockUseQuery, mockUseMutation, mockUseQueryClient, mockInvalidate } = vi.hoisted(() => {
-  const mockInvalidate = vi.fn();
-  return {
-    mockUseQuery: vi.fn(),
-    mockUseMutation: vi.fn(),
-    mockUseQueryClient: vi.fn(() => ({ invalidateQueries: mockInvalidate })),
-    mockInvalidate,
-  };
-});
+const { mockUseQuery, mockUseMutation, mockUseQueryClient } = vi.hoisted(() => ({
+  mockUseQuery: vi.fn(),
+  mockUseMutation: vi.fn(),
+  mockUseQueryClient: vi.fn(() => ({ invalidateQueries: vi.fn() })),
+}));
 
 vi.mock('@tanstack/react-query', () => ({
   useQuery: mockUseQuery,
   useMutation: mockUseMutation,
   useQueryClient: mockUseQueryClient,
-  useMemo: vi.fn(),
 }));
 
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
@@ -34,14 +29,6 @@ vi.mock('@/services/contratoTemplateService', () => ({
 
 vi.mock('@/utils/safeError', () => ({
   safeErrorMessage: vi.fn((e: any, fallback: string) => fallback),
-}));
-
-// useMemo must be real for useContratosVencendo to work (it uses it internally)
-import * as React from 'react';
-vi.mock('@tanstack/react-query', () => ({
-  useQuery: mockUseQuery,
-  useMutation: mockUseMutation,
-  useQueryClient: mockUseQueryClient,
 }));
 
 import { useContratosVencendo } from '../useContratosVencendo';
