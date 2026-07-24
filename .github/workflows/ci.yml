@@ -1,1 +1,89 @@
-bmFtZTogQ29udGludW91cyBJbnRlZ3JhdGlvbiAmIERlbGl2ZXJ5CgpvbjoKICB3b3JrZmxvd19kaXNwYXRjaDoKICBwdXNoOgogICAgYnJhbmNoZXM6IFsgbWFpbiwgbWFzdGVyIF0KICBwdWxsX3JlcXVlc3Q6CiAgICBicmFuY2hlczogWyBtYWluLCBtYXN0ZXIgXQoKY29uY3VycmVuY3k6CiAgZ3JvdXA6ICR7eyBnaXRodWIud29ya2Zsb3cgfX0tJHt7IGdpdGh1Yi5yZWYgfX0KICBjYW5jZWwtaW4tcHJvZ3Jlc3M6IHRydWUKCmRlZmF1bHRzOgogIHJ1bjoKICAgIHNoZWxsOiBiYXNoCgpqb2JzOgogIHR5cGVjaGVjazoKICAgIG5hbWU6IFR5cGUgQ2hlY2sKICAgIHJ1bnMtb246IHVidW50dS1sYXRlc3QKICAgIHN0ZXBzOgogICAgICAtIHVzZXM6IGFjdGlvbnMvY2hlY2tvdXRAdjQKICAgICAgLSB1c2VzOiBhY3Rpb25zL3NldHVwLW5vZGVAdjQKICAgICAgICB3aXRoOgogICAgICAgICAgbm9kZS12ZXJzaW9uOiAnMjInCiAgICAgIC0gbmFtZTogSW5zdGFsbAogICAgICAgIHJ1bjogbnBtIGluc3RhbGwgLS1uby1hdWRpdCAtLW5vLWZ1bmQKICAgICAgLSBuYW1lOiBUeXBlIENoZWNrCiAgICAgICAgcnVuOiBucG0gcnVuIHR5cGVjaGVjawoKICBsaW50OgogICAgbmFtZTogTGludAogICAgcnVucy1vbjogdWJ1bnR1LWxhdGVzdAogICAgc3RlcHM6CiAgICAgIC0gdXNlczogYWN0aW9ucy9jaGVja291dEB2NAogICAgICAtIHVzZXM6IGFjdGlvbnMvc2V0dXAtbm9kZUB2NAogICAgICAgIHdpdGg6CiAgICAgICAgICBub2RlLXZlcnNpb246ICcyMicKICAgICAgLSBuYW1lOiBJbnN0YWxsCiAgICAgICAgcnVuOiBucG0gaW5zdGFsbCAtLW5vLWF1ZGl0IC0tbm8tZnVuZAogICAgICAtIG5hbWU6IExpbnQKICAgICAgICBydW46IG5wbSBydW4gbGludDpjaQoKICB0ZXN0OgogICAgbmFtZTogVW5pdCBUZXN0cwogICAgcnVucy1vbjogdWJ1bnR1LWxhdGVzdAogICAgZW52OgogICAgICBWSVRFX1NVUEFCQVNFX1VSTDogJHt7IHNlY3JldHMuVklURV9TVVBBQkFTRV9VUkwgfHwgJycgfX0KICAgICAgVklURV9TVVBBQkFTRV9BTk9OX0tFWTogJHt7IHNlY3JldHMuVklURV9TVVBBQkFTRV9BTk9OX0tFWSB8fCAnJyB9fQogICAgc3RlcHM6CiAgICAgIC0gdXNlczogYWN0aW9ucy9jaGVja291dEB2NAogICAgICAtIHVzZXM6IGFjdGlvbnMvc2V0dXAtbm9kZUB2NAogICAgICAgIHdpdGg6CiAgICAgICAgICBub2RlLXZlcnNpb246ICcyMicKICAgICAgLSBuYW1lOiBJbnN0YWxsCiAgICAgICAgcnVuOiBucG0gaW5zdGFsbCAtLW5vLWF1ZGl0IC0tbm8tZnVuZAogICAgICAtIG5hbWU6IFVuaXQgVGVzdHMKICAgICAgICBydW46IG5wbSBydW4gdGVzdDpjb3ZlcmFnZQoKICBlZGdlLWZ1bmN0aW9uczoKICAgIG5hbWU6IEVkZ2UgRnVuY3Rpb25zIChkZW5vIGNoZWNrKQogICAgcnVucy1vbjogdWJ1bnR1LWxhdGVzdAogICAgc3RlcHM6CiAgICAgIC0gdXNlczogYWN0aW9ucy9jaGVja291dEB2NAogICAgICAtIHVzZXM6IGRlbm9sYW5kL3NldHVwLWRlbm9AdjIKICAgICAgICB3aXRoOgogICAgICAgICAgZGVuby12ZXJzaW9uOiB2Mi54CiAgICAgIC0gbmFtZTogVHlwZS1jaGVjayBleHRlcm5hbC1kYi1icmlkZ2UgKGdhdGUgY3LDrXRpY28pCiAgICAgICAgIyBWZXJpZmljYSBvIGJyaWRnZSBjb20gemVybyB0b2xlcsOibmNpYSDigJQgdmFsaWRhZG8gY29tIDAgZXJyb3MgZGVzZGUgTTYuCiAgICAgICAgIyBFc3RlIMOpIG8gw7puaWNvIGVkZ2UgZnVuY3Rpb24gY29tIGFjZXNzbyBhIERCIGV4dGVybm87IGVycm9zIGRlIHRpcG8KICAgICAgICAjIGFxdWkgY2F1c2FtIGZhbGhhcyBzaWxlbmNpb3NhcyBlbSBwcm9kdcOnw6NvLgogICAgICAgIHJ1bjogZGVubyBjaGVjayAtLW5vLWxvY2sgc3VwYWJhc2UvZnVuY3Rpb25zL2V4dGVybmFsLWRiLWJyaWRnZS9pbmRleC50cwogICAgICAtIG5hbWU6IFR5cGUtY2hlY2sgZGVtYWlzIGVkZ2UgZnVuY3Rpb25zIChpbmZvcm1hdGl2bykKICAgICAgICAjIFBhc3NhIG1lc21vIGNvbSBlcnJvcyDigJQgYXBlbmFzIGdlcmEgcmVsYXTDs3JpbyBwYXJhIHJhc3RyZWFtZW50byBwcm9ncmVzc2l2by4KICAgICAgICAjIEFzIGRlbWFpcyBmdW7Dp8O1ZXMgc2Vyw6NvIG1pZ3JhZGFzIGdyYWR1YWxtZW50ZSBwYXJhIHplcm8gZXJyb3MuCiAgICAgICAgY29udGludWUtb24tZXJyb3I6IHRydWUKICAgICAgICBydW46IHwKICAgICAgICAgIEVSUk9SUz0wCiAgICAgICAgICBmb3IgZm4gaW4gc3VwYWJhc2UvZnVuY3Rpb25zLyovaW5kZXgudHM7IGRvCiAgICAgICAgICAgIGRpcj0kKGRpcm5hbWUgIiRmbiIpCiAgICAgICAgICAgIG5hbWU9JChiYXNlbmFtZSAiJGRpciIpCiAgICAgICAgICAgIGlmIFsgIiRuYW1lIiA9ICJleHRlcm5hbC1kYi1icmlkZ2UiIF07IHRoZW4gY29udGludWU7IGZpCiAgICAgICAgICAgIGlmICEgZGVubyBjaGVjayAtLW5vLWxvY2sgIiRmbiIgMj4vZGV2L251bGw7IHRoZW4KICAgICAgICAgICAgICBFUlJPUlM9JCgoRVJST1JTKzEpKQogICAgICAgICAgICAgIGVjaG8gIiAg4pqgICRuYW1lOiBlcnJvcyBkZSB0aXBvIChuw6NvIGJsb3F1ZWlhKSIKICAgICAgICAgICAgZmkKICAgICAgICAgIGRvbmUKICAgICAgICAgIGVjaG8gIkZ1bsOnw7VlcyBjb20gZXJyb3MgZGUgdGlwbyAobsOjby1icmlkZ2UpOiAkRVJST1JTIgo=
+name: Continuous Integration & Delivery
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Type Check
+        run: npm run typecheck
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Lint
+        run: npm run lint:ci
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || '' }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Unit Tests
+        run: npm run test:coverage
+
+  edge-functions:
+    name: Edge Functions (deno check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check external-db-bridge (gate crítico)
+        # Verifica o bridge com zero tolerância — validado com 0 erros desde M6.
+        # Este é o único edge function com acesso a DB externo; erros de tipo
+        # aqui causam falhas silenciosas em produção.
+        run: deno check --no-lock supabase/functions/external-db-bridge/index.ts
+      - name: Type-check demais edge functions (informativo)
+        # Passa mesmo com erros — apenas gera relatório para rastreamento progressivo.
+        # As demais funções serão migradas gradualmente para zero erros.
+        continue-on-error: true
+        run: |
+          ERRORS=0
+          for fn in supabase/functions/*/index.ts; do
+            dir=$(dirname "$fn")
+            name=$(basename "$dir")
+            if [ "$name" = "external-db-bridge" ]; then continue; fi
+            if ! deno check --no-lock "$fn" 2>/dev/null; then
+              ERRORS=$((ERRORS+1))
+              echo "  ⚠ $name: erros de tipo (não bloqueia)"
+            fi
+          done
+          echo "Funções com erros de tipo (não-bridge): $ERRORS"
