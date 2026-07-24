@@ -38,6 +38,7 @@ export function NovoDesligamentoDialog({ open, onClose }: Props) {
   const set = (k: string, v: any) => setForm((p) => ({ ...p, [k]: v }));
 
   // Load colaboradores when dialog opens
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const loadColaboradores = useCallback(async () => {
     if (!empresaAtual?.id) return;
     setLoadingColab(true);

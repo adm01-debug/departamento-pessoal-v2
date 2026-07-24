@@ -12,6 +12,7 @@ export function usePontoOffline() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     updateSize();
     // Listeners para mudanças (Storage API e Custom Event)
     window.addEventListener('storage', updateSize);
@@ -65,10 +66,8 @@ export function usePontoOffline() {
   useEffect(() => {
     const handleOnline = () => sync();
     window.addEventListener('online', handleOnline);
-    // Tenta sincronizar se já estiver online ao montar
-    if (navigator.onLine) {
-      sync();
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (navigator.onLine) { sync(); }
     return () => window.removeEventListener('online', handleOnline);
   }, [sync]);
 

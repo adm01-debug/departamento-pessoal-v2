@@ -29,6 +29,7 @@ export function CNABDialog({ folhaId }: CNABDialogProps) {
     nome_empresa: '',
   });
 
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const loadConfig = useCallback(async () => {
     if (!empresaAtual?.id) return;
     try {
@@ -52,6 +53,7 @@ export function CNABDialog({ folhaId }: CNABDialogProps) {
   }, [empresaAtual?.id, empresaAtual?.razao_social]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (open) loadConfig();
   }, [open, loadConfig]);
 

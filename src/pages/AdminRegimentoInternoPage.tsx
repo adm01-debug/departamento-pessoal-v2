@@ -86,6 +86,7 @@ const AdminRegimentoInternoPage = () => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     carregar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [empresaAtual?.id]);

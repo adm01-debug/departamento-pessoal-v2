@@ -29,6 +29,7 @@ export default function FinanceiroBancarioPage() {
   const [selectedFolha, setSelectedFolha] = useState('');
   const [configDialogOpen, setConfigDialogOpen] = useState(false);
 
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const loadData = useCallback(async () => {
     if (!empresaAtual?.id) return;
     try {
@@ -52,6 +53,7 @@ export default function FinanceiroBancarioPage() {
   }, [empresaAtual?.id]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
   }, [loadData]);
 

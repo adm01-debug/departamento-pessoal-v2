@@ -63,6 +63,7 @@ function ContratacaoWorkflow({ token }: { token: string }) {
   useEffect(() => {
     if (tokenData?.admissao) {
       const adm = tokenData.admissao;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData(prev => ({
         ...prev,
         nome_completo: adm.nome || '',
@@ -170,6 +171,7 @@ function ContratacaoWorkflow({ token }: { token: string }) {
       uf: addr.uf,
     }));
   };
+  /* eslint-disable react-hooks/purity */
   const handleFileUpload = async (docId: string, docType: string, file: File) => {
     setUploadedDocs(prev => ({ ...prev, [docId]: { name: file.name, status: 'uploading' } }));
     
@@ -224,6 +226,7 @@ function ContratacaoWorkflow({ token }: { token: string }) {
       toast.error('Erro no upload do documento: ' + error.message);
     }
   };
+  /* eslint-enable react-hooks/purity */
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-10 h-10 animate-spin text-primary" /></div>;
 

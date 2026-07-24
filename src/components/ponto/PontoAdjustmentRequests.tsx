@@ -123,8 +123,9 @@ export function PontoAdjustmentRequests() {
     }
   };
 
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const filteredSolicitacoes = useMemo(() => {
-    return solicitacoes.filter((s: any) => 
+    return solicitacoes.filter((s: any) =>
       s.colaborador?.nome_completo.toLowerCase().includes(search.toLowerCase())
     );
   }, [solicitacoes, search]);

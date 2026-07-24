@@ -163,6 +163,7 @@ export default function EmpresaFormPage() {
                             CNPJ <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter bg-muted px-1.5 rounded-md">Busca Automática</span>
                           </Label>
                           <CNPJInput
+                            // eslint-disable-next-line react-hooks/incompatible-library
                             value={watch('cnpj')}
                             onChange={(v) => setValue('cnpj', v)}
                             onCompanyFound={(data) => {

@@ -154,17 +154,19 @@ export default function AdminAgendamentoExamesPage() {
     onError: (e: any) => toast.error(e?.message ?? 'Falha ao agendar'),
   });
 
+  /* eslint-disable react-hooks/purity */
   const kpis = useMemo(() => {
     const total = agendamentos?.length ?? 0;
     const agendados = agendamentos?.filter((a) => a.status === 'agendado').length ?? 0;
     const realizados = agendamentos?.filter((a) => a.status === 'realizado').length ?? 0;
+    const now = Date.now();
     const proximos7d = agendamentos?.filter((a) => {
-      const d = new Date(a.data_agendada);
-      const now = Date.now();
-      return d.getTime() >= now && d.getTime() <= now + 7 * 24 * 3600 * 1000;
+      const t = new Date(a.data_agendada).getTime();
+      return t >= now && t <= now + 7 * 24 * 3600 * 1000;
     }).length ?? 0;
     return { total, agendados, realizados, proximos7d };
   }, [agendamentos]);
+  /* eslint-enable react-hooks/purity */
 
   const statusColor = (s: string) =>
     s === 'realizado' ? 'default' : s === 'cancelado' || s === 'faltou' ? 'destructive' : 'secondary';

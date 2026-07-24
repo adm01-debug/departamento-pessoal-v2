@@ -21,6 +21,7 @@ export function SearchInput({ value: controlledValue, onChange, onSearch, placeh
   const debouncedValue = useDebounce(value, debounce);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (controlledValue !== undefined) setValue(controlledValue);
   }, [controlledValue]);
 

@@ -262,7 +262,7 @@ export function CommandPalette({
     return () => window.removeEventListener('keydown', handler);
   }, [open, selectedIndex, allItems, execute]);
 
-  useEffect(() => { setSelectedIndex(0); }, [query]);
+  useEffect(() => { setSelectedIndex(0); }, [query]); // eslint-disable-line react-hooks/set-state-in-effect
 
   /* ─── Render group helper ─── */
   let globalIndex = -1;

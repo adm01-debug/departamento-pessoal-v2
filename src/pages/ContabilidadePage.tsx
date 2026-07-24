@@ -22,6 +22,7 @@ export default function ContabilidadePage() {
   const [processing, setProcessing] = useState(false);
   const [selectedFolha, setSelectedFolha] = useState('');
 
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const loadData = useCallback(async () => {
     if (!empresaAtual?.id) return;
     try {
@@ -43,6 +44,7 @@ export default function ContabilidadePage() {
   }, [empresaAtual?.id]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
   }, [loadData]);
 

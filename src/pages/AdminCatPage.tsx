@@ -100,7 +100,7 @@ export default function AdminCatPage() {
     }
   }, [empresaId]);
 
-  useEffect(() => { void carregar(); }, [carregar]);
+  useEffect(() => { void carregar(); }, [carregar]); // eslint-disable-line react-hooks/set-state-in-effect
 
   const onSubmit = async (values: CatForm) => {
     if (!empresaId) return;

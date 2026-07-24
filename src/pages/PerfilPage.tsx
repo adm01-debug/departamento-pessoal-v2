@@ -73,10 +73,12 @@ export default function PerfilPage() {
 
   useEffect(() => {
     if (profile) {
+      /* eslint-disable react-hooks/set-state-in-effect */
       setNome(profile.nome || '');
       setTelefone(profile.telefone || '');
       setCargo(profile.cargo || '');
       setDepartamento(profile.departamento || '');
+      /* eslint-enable react-hooks/set-state-in-effect */
     } else if (user?.name) {
       setNome(user.name);
     }

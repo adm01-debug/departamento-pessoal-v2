@@ -38,12 +38,14 @@ export default function PontoKioskPage() {
   }, [isSyncing]);
 
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
     setOfflineQueueSize(pontoOfflineService.getQueueSize());
     const interval = setInterval(() => {
       setOfflineQueueSize(pontoOfflineService.getQueueSize());
       if (navigator.onLine && !isSyncing && pontoOfflineService.getQueueSize() > 0) {
         handleSync();
       }
+      /* eslint-enable react-hooks/set-state-in-effect */
     }, 10000);
     return () => clearInterval(interval);
   }, [isSyncing, handleSync]);

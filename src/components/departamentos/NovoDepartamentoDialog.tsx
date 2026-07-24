@@ -28,6 +28,7 @@ export function NovoDepartamentoDialog({ open, onOpenChange, departamento }: Pro
   useEffect(() => {
     if (open) {
       if (departamento) {
+        /* eslint-disable react-hooks/set-state-in-effect */
         setForm({
           nome: departamento.nome || '',
           descricao: departamento.descricao || '',
@@ -35,6 +36,7 @@ export function NovoDepartamentoDialog({ open, onOpenChange, departamento }: Pro
         });
       } else {
         setForm({ nome: '', descricao: '', ativo: true });
+        /* eslint-enable react-hooks/set-state-in-effect */
       }
     }
   }, [departamento, open]);

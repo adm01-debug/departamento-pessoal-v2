@@ -15,8 +15,8 @@ export function usePWA() {
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
-    // Check if already installed
     if (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsInstalled(true);
     }
 

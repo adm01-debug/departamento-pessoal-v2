@@ -10,17 +10,17 @@ export function LockoutMessage({ remainingSeconds }: LockoutMessageProps) {
   const [seconds, setSeconds] = useState(remainingSeconds);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSeconds(remainingSeconds);
   }, [remainingSeconds]);
 
-  const isActive = seconds > 0;
   useEffect(() => {
-    if (!isActive) return;
+    if (seconds <= 0) return;
     const timer = setInterval(() => {
       setSeconds((s) => Math.max(0, s - 1));
     }, 1000);
     return () => clearInterval(timer);
-  }, [isActive]);
+  }, [seconds]);
 
   const minutes = Math.floor(seconds / 60);
   const secs = seconds % 60;

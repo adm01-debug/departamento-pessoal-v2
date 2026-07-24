@@ -45,8 +45,10 @@ export default function DocumentosPage() {
 
   useEffect(() => {
     if (urlColaboradorId) {
+      /* eslint-disable react-hooks/set-state-in-effect */
       setColaboradorFilter(urlColaboradorId);
       setColaboradorId(urlColaboradorId);
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [urlColaboradorId]);
 

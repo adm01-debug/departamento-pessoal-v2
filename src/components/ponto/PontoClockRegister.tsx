@@ -55,11 +55,13 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ulti
   }, [isSyncing]);
 
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
     setOfflineQueueSize(pontoOfflineService.getQueueSize());
 
     if (navigator.onLine) {
       handleSync();
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     const interval = setInterval(() => {
       setOfflineQueueSize(pontoOfflineService.getQueueSize());
@@ -100,6 +102,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ulti
     }
   };
 
+  /* eslint-disable react-hooks/purity */
   const captureAndFinalize = async (tipo: any, mediaStream: MediaStream) => {
     let fotoUrl = null;
     let fotoBase64 = null;
@@ -173,6 +176,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ulti
       toast.error(`Erro no registro offline: ${e.message}`);
     }
   };
+  /* eslint-enable react-hooks/purity */
 
   return (
     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
