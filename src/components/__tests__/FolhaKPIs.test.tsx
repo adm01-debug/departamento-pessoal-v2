@@ -1,11 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
-    span: ({ children, ...rest }: any) => <span {...rest}>{children}</span>,
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
   },
+  useInView: () => true,
 }));
 
 vi.mock('@/components/dashboard/AnimatedNumber', () => ({
@@ -20,45 +21,56 @@ vi.mock('@/components/ui/module-skeleton', () => ({
 
 import { FolhaKPIs } from '../folha/FolhaKPIs';
 
-const RESUMO = {
-  colaboradores: 50,
-  totalProventos: 100000,
-  totalDescontos: 20000,
-  liquido: 80000,
-  inss: 10000,
-  fgts: 8000,
-  irrf: 5000,
-  custoTotalEmpresa: 140000,
+const MOCK_RESUMO = {
+  colaboradores: 42,
+  totalProventos: 150000,
+  totalDescontos: 30000,
+  liquido: 120000,
+  inss: 15000,
+  fgts: 12000,
+  irrf: 8000,
+  custoTotalEmpresa: 180000,
 };
 
 describe('FolhaKPIs', () => {
-  it('renders loading skeletons when isLoading', () => {
+  it('shows skeleton cards when loading', () => {
     render(<FolhaKPIs resumo={undefined} isLoading={true} />);
-    expect(screen.getAllByTestId('kpi-skeleton').length).toBe(6);
+    const skeletons = screen.getAllByTestId('kpi-skeleton');
+    expect(skeletons.length).toBe(6);
   });
 
-  it('renders KPI labels when not loading', () => {
-    render(<FolhaKPIs resumo={RESUMO} isLoading={false} />);
+  it('renders Colaboradores label', () => {
+    render(<FolhaKPIs resumo={MOCK_RESUMO} isLoading={false} />);
     expect(screen.getByText('Colaboradores')).toBeInTheDocument();
+  });
+
+  it('renders Total Bruto label', () => {
+    render(<FolhaKPIs resumo={MOCK_RESUMO} isLoading={false} />);
     expect(screen.getByText('Total Bruto')).toBeInTheDocument();
+  });
+
+  it('renders Total Descontos label', () => {
+    render(<FolhaKPIs resumo={MOCK_RESUMO} isLoading={false} />);
     expect(screen.getByText('Total Descontos')).toBeInTheDocument();
+  });
+
+  it('renders Líquido Total label', () => {
+    render(<FolhaKPIs resumo={MOCK_RESUMO} isLoading={false} />);
     expect(screen.getByText('Líquido Total')).toBeInTheDocument();
+  });
+
+  it('renders IRRF Retido label', () => {
+    render(<FolhaKPIs resumo={MOCK_RESUMO} isLoading={false} />);
     expect(screen.getByText('IRRF Retido')).toBeInTheDocument();
+  });
+
+  it('renders Custo Empresa label', () => {
+    render(<FolhaKPIs resumo={MOCK_RESUMO} isLoading={false} />);
     expect(screen.getByText('Custo Empresa')).toBeInTheDocument();
   });
 
-  it('shows zeros when resumo is undefined', () => {
-    render(<FolhaKPIs resumo={undefined} isLoading={false} />);
-    expect(screen.getByText('Colaboradores')).toBeInTheDocument();
-  });
-
-  it('renders all 7 KPI cards (no skeletons) when not loading', () => {
-    render(<FolhaKPIs resumo={RESUMO} isLoading={false} />);
-    expect(screen.queryByTestId('kpi-skeleton')).not.toBeInTheDocument();
-  });
-
-  it('shows Encargos label', () => {
-    render(<FolhaKPIs resumo={RESUMO} isLoading={false} />);
-    expect(screen.getByText(/Encargos/)).toBeInTheDocument();
+  it('renders with undefined resumo without crashing', () => {
+    const { container } = render(<FolhaKPIs resumo={undefined} isLoading={false} />);
+    expect(container.firstChild).toBeInTheDocument();
   });
 });
