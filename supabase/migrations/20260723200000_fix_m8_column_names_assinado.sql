@@ -1,1 +1,196 @@
-LS0gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KLS0gTUVMSE9SSUEgMTMg4oCUIENvcnJlw6fDo28gZGUgYnVncyBkZSBjb2x1bmEgbmEgbWlncmHDp8OjbyBNOCAoMTcwMDAwKQotLQotLSBEZXRlY3RhZG9zIHZpYSB0ZXN0ZSBleGF1c3Rpdm8gcMOzcy1NODoKLS0KLS0gTTguMSDwn5S0IGNvbnRyYXRvX2Fzc2luYXJfcG9yX3Rva2VuOiB1c2EgJ2Fzc2luYWRvX3VzZXJfYWdlbnQnIG1hcyBhIHRhYmVsYQotLSAgIGNvbnRyYXRvX2Fzc2luYXR1cmFfdG9rZW5zIHRlbSAnYXNzaW5hZG9fdWEnIChub21lIG9yaWdpbmFsIGRlIDE0NTYwMikuCi0tICAg4oaSIFVQREFURSBmYWxoYSBjb20gImNvbHVtbiBhc3NpbmFkb191c2VyX2FnZW50IGRvZXMgbm90IGV4aXN0IgotLQotLSBNOC4yIPCflLQgY29udHJhdG9fYXNzaW5hcl9wb3JfdG9rZW46IGFybWF6ZW5hIHBfbm9tZSBlbSAnYXNzaW5hZG9fbm9tZScsCi0tICAgY29sdW5hIHF1ZSBuw6NvIGV4aXN0ZSBuYSB0YWJlbGEuIOKGkiBVUERBVEUgZmFsaGEuCi0tICAgRklYOiBBREQgQ09MVU1OIGFzc2luYWRvX25vbWUgdGV4dCArIHVzYXIgY29sdW5hIGNvcnJldGEuCi0tCi0tIE04LjMg8J+UtCBjb250cmF0b19jb25zdWx0YXJfcG9yX3Rva2VuOiBsw6ogdl90b2subm9tZV9zaWduYXRhcmlvIG1hcwotLSAgIGNvbnRyYXRvX2Fzc2luYXR1cmFfdG9rZW5zIG7Do28gdGVtIGVzc2EgY29sdW5hLiDihpIgcnVudGltZSBlcnJvci4KLS0gICBGSVg6IHJldG9ybmFyIGNhbXBvIGRvIGNvbGFib3JhZG9yIHZpYSBKT0lOIGVtIGNvbnRyYXRvc19nZXJhZG9zLgotLSA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQoKLS0gTTguMiBmaXg6IGFkaWNpb25hciBjb2x1bmEgYXNzaW5hZG9fbm9tZSAoZXN0YXZhIHNlbmRvIHJlZmVyZW5jaWFkYSBzZW0gZXhpc3RpcikKQUxURVIgVEFCTEUgcHVibGljLmNvbnRyYXRvX2Fzc2luYXR1cmFfdG9rZW5zCiAgQUREIENPTFVNTiBJRiBOT1QgRVhJU1RTIGFzc2luYWRvX25vbWUgdGV4dDsKCi0tIFJlZXNjcmV2ZXIgY29udHJhdG9fYXNzaW5hcl9wb3JfdG9rZW4gY29tIG5vbWVzIGRlIGNvbHVuYSBjb3JyZXRvcwpDUkVBVEUgT1IgUkVQTEFDRSBGVU5DVElPTiBwdWJsaWMuY29udHJhdG9fYXNzaW5hcl9wb3JfdG9rZW4oCiAgcF90b2tlbiAgICAgICB0ZXh0LAogIHBfY3BmICAgICAgICAgdGV4dCwKICBwX25vbWUgICAgICAgIHRleHQsCiAgcF9pcCAgICAgICAgICBpbmV0ICAgIERFRkFVTFQgTlVMTCwKICBwX3VzZXJfYWdlbnQgIHRleHQgICAgREVGQVVMVCBOVUxMLAogIHBfbG9jYWxpemFjYW8gdGV4dCAgICBERUZBVUxUIE5VTEwsCiAgcF9kaXNwb3NpdGl2byB0ZXh0ICAgIERFRkFVTFQgTlVMTAopClJFVFVSTlMganNvbmIKTEFOR1VBR0UgcGxwZ3NxbApTRUNVUklUWSBERUZJTkVSClNFVCBzZWFyY2hfcGF0aCA9IHB1YmxpYwpBUyAkJApERUNMQVJFCiAgdl9oYXNoIHRleHQ7CiAgdl90b2sgIHJlY29yZDsKICB2X2NnICAgcmVjb3JkOwpCRUdJTgogIHZfaGFzaCA6PSBlbmNvZGUoc2hhMjU2KHBfdG9rZW46OmJ5dGVhKSwgJ2hleCcpOwoKICBTRUxFQ1QgKiBJTlRPIHZfdG9rCiAgRlJPTSBwdWJsaWMuY29udHJhdG9fYXNzaW5hdHVyYV90b2tlbnMKICBXSEVSRSB0b2tlbl9oYXNoID0gdl9oYXNoCiAgRk9SIFVQREFURTsKCiAgSUYgdl90b2sgSVMgTlVMTCBUSEVOCiAgICBSQUlTRSBFWENFUFRJT04gJ1Rva2VuIG7Do28gZW5jb250cmFkbyBvdSBpbnbDoWxpZG8uJzsKICBFTkQgSUY7CgogIC0tIEJ1ZyBBMiBmaXg6IGJsb3F1ZWFyIHRva2VuIHJldm9nYWRvCiAgSUYgdl90b2sucmV2b2dhZG9fZW0gSVMgTk9UIE5VTEwgVEhFTgogICAgUkFJU0UgRVhDRVBUSU9OICdUb2tlbiByZXZvZ2FkbyBlbSAlIChtb3Rpdm86ICUpLicsIHZfdG9rLnJldm9nYWRvX2VtLAogICAgICAgICAgICAgICAgICAgIENPQUxFU0NFKHZfdG9rLnJldm9nYWNhb19tb3Rpdm8sICduw6NvIGluZm9ybWFkbycpOwogIEVORCBJRjsKCiAgSUYgdl90b2sudXNhZG9fZW0gSVMgTk9UIE5VTEwgVEhFTgogICAgUkFJU0UgRVhDRVBUSU9OICdUb2tlbiBqw6EgdXRpbGl6YWRvIGVtICUuJywgdl90b2sudXNhZG9fZW07CiAgRU5EIElGOwoKICBJRiB2X3Rvay5leHBpcmFfZW0gPCBub3coKSBUSEVOCiAgICBSQUlTRSBFWENFUFRJT04gJ1Rva2VuIGV4cGlyYWRvIGVtICUuJywgdl90b2suZXhwaXJhX2VtOwogIEVORCBJRjsKCiAgLS0gVmVyaWZpY2FyIENQRgogIElGIHZfdG9rLmNwZl9lc3BlcmFkbyBJUyBOT1QgTlVMTCBBTkQgdl90b2suY3BmX2VzcGVyYWRvIDw+IHBfY3BmIFRIRU4KICAgIFVQREFURSBwdWJsaWMuY29udHJhdG9fYXNzaW5hdHVyYV90b2tlbnMKICAgIFNFVCB0ZW50YXRpdmFzID0gdGVudGF0aXZhcyArIDEKICAgIFdIRVJFIGlkID0gdl90b2suaWQ7CiAgICBSQUlTRSBFWENFUFRJT04gJ0NQRiBpbmZvcm1hZG8gbsOjbyBjb3JyZXNwb25kZSBhbyBlc3BlcmFkbyBwYXJhIGVzdGUgdG9rZW4uJzsKICBFTkQgSUY7CgogIC0tIEJ1c2NhciBjb250cmF0bwogIFNFTEVDVCAqIElOVE8gdl9jZwogIEZST00gcHVibGljLmNvbnRyYXRvc19nZXJhZG9zCiAgV0hFUkUgaWQgPSB2X3Rvay5jb250cmF0b19pZAogIEZPUiBVUERBVEU7CgogIElGIHZfY2cgSVMgTlVMTCBUSEVOCiAgICBSQUlTRSBFWENFUFRJT04gJ0NvbnRyYXRvIG7Do28gZW5jb250cmFkby4nOwogIEVORCBJRjsKCiAgLS0gTWFyY2FyIHRva2VuIGNvbW8gdXNhZG8g4oCUIE04LjEgZml4OiBhc3NpbmFkb191YSAobsOjbyBhc3NpbmFkb191c2VyX2FnZW50KQogIC0tICAgICAgICAgICAgICAgICAgICAgICAgICAgIE04LjIgZml4OiBhc3NpbmFkb19ub21lIChhZ29yYSBleGlzdGUgdmlhIEFERCBDT0xVTU4pCiAgVVBEQVRFIHB1YmxpYy5jb250cmF0b19hc3NpbmF0dXJhX3Rva2VucwogIFNFVCB1c2Fkb19lbSAgICAgID0gbm93KCksCiAgICAgIGFzc2luYWRvX25vbWUgPSBwX25vbWUsICAgICAgICAgIC0tIE04LjI6IGNvbHVuYSBhZGljaW9uYWRhIGFjaW1hCiAgICAgIGFzc2luYWRvX2lwICAgPSBwX2lwLAogICAgICBhc3NpbmFkb191YSAgID0gcF91c2VyX2FnZW50LCAgICAtLSBNOC4xOiBlcmEgYXNzaW5hZG9fdXNlcl9hZ2VudCAoZXJyYWRvKQogICAgICB0ZW50YXRpdmFzICAgID0gdGVudGF0aXZhcyArIDEKICBXSEVSRSBpZCA9IHZfdG9rLmlkOwoKICAtLSBBdHVhbGl6YXIgY29udHJhdG8KICBVUERBVEUgcHVibGljLmNvbnRyYXRvc19nZXJhZG9zCiAgU0VUIHN0YXR1cyAgICAgICAgICAgICA9ICdhc3NpbmFkbycsCiAgICAgIGFzc2luYWRvX2VtICAgICAgICA9IG5vdygpLAogICAgICBhc3NpbmF0dXJhX21ldGFkYXRhID0ganNvbmJfYnVpbGRfb2JqZWN0KAogICAgICAgICdjcGYnLCAgICAgICAgcF9jcGYsCiAgICAgICAgJ25vbWUnLCAgICAgICBwX25vbWUsCiAgICAgICAgJ2lwJywgICAgICAgICBwX2lwOjp0ZXh0LAogICAgICAgICd1c2VyX2FnZW50JywgcF91c2VyX2FnZW50LAogICAgICAgICdsb2NhbGl6YWNhbycsIHBfbG9jYWxpemFjYW8sCiAgICAgICAgJ2Rpc3Bvc2l0aXZvJywgcF9kaXNwb3NpdGl2bywKICAgICAgICAnYXNzaW5hZG9fZW0nLCBub3coKQogICAgICApCiAgV0hFUkUgaWQgPSB2X2NnLmlkOwoKICAtLSBJbnNlcmlyIGV2ZW50bwogIEJFR0lOCiAgICBJTlNFUlQgSU5UTyBwdWJsaWMuY29udHJhdG9fdG9rZW5fZXZlbnRvcyhlbXByZXNhX2lkLCB0b2tlbl9pZCwgY29udHJhdG9faWQsIGV2ZW50bywgZGV0YWxoZXMsIGlwKQogICAgVkFMVUVTICh2X3Rvay5lbXByZXNhX2lkLCB2X3Rvay5pZCwgdl90b2suY29udHJhdG9faWQsICdhc3NpbmFkbycsCiAgICAgICAgICAgIGpzb25iX2J1aWxkX29iamVjdCgnY3BmJywgcF9jcGYsICdub21lJywgcF9ub21lLCAnaXAnLCBwX2lwOjp0ZXh0KSwKICAgICAgICAgICAgcF9pcCk7CiAgRVhDRVBUSU9OIFdIRU4gT1RIRVJTIFRIRU4gTlVMTDsgRU5EOwoKICAtLSBSZWdpc3RyYXIgZW0gYXVkaXRfbG9nCiAgQkVHSU4KICAgIElOU0VSVCBJTlRPIHB1YmxpYy5hdWRpdF9sb2dfdW5pZmllZChzb3VyY2VfdGFibGUsIHNvdXJjZV9pZCwgZW1wcmVzYV9pZCwgYWN0aW9uLCBlbnRpdHksIGVudGl0eV9pZCwgcGF5bG9hZCwgaXBfYWRkcmVzcywgdXNlcl9hZ2VudCkKICAgIFZBTFVFUyAoJ2NvbnRyYXRvc19nZXJhZG9zJywgdl9jZy5pZCwgdl9jZy5lbXByZXNhX2lkLCAnQVNTSU5BUicsICdjb250cmF0bycsIHZfY2cuaWQ6OnRleHQsCiAgICAgICAgICAgIGpzb25iX2J1aWxkX29iamVjdCgnY3BmJywgcF9jcGYsICdub21lJywgcF9ub21lKSwgcF9pcCwgcF91c2VyX2FnZW50KTsKICBFWENFUFRJT04gV0hFTiBPVEhFUlMgVEhFTiBOVUxMOyBFTkQ7CgogIFJFVFVSTiBqc29uYl9idWlsZF9vYmplY3QoCiAgICAnc3VjZXNzbycsICAgICAgIHRydWUsCiAgICAnY29udHJhdG9faWQnLCAgIHZfY2cuaWQsCiAgICAnZW1wcmVzYV9pZCcsICAgIHZfY2cuZW1wcmVzYV9pZCwKICAgICdhc3NpbmFkb19lbScsICAgbm93KCksCiAgICAnc3RhdHVzJywgICAgICAgICdhc3NpbmFkbycKICApOwpFTkQ7CiQkOwoKLS0gUmVlc2NyZXZlciBjb250cmF0b19jb25zdWx0YXJfcG9yX3Rva2VuIOKAlCBNOC4zIGZpeDogcmVtb3ZlciB2X3Rvay5ub21lX3NpZ25hdGFyaW8KQ1JFQVRFIE9SIFJFUExBQ0UgRlVOQ1RJT04gcHVibGljLmNvbnRyYXRvX2NvbnN1bHRhcl9wb3JfdG9rZW4ocF90b2tlbiB0ZXh0KQpSRVRVUk5TIGpzb25iCkxBTkdVQUdFIHBscGdzcWwKU0VDVVJJVFkgREVGSU5FUgpTRVQgc2VhcmNoX3BhdGggPSBwdWJsaWMKQVMgJCQKREVDTEFSRQogIHZfaGFzaCB0ZXh0OwogIHZfdG9rICByZWNvcmQ7CiAgdl9jZyAgIHJlY29yZDsKICB2X3RwbCAgcmVjb3JkOwpCRUdJTgogIHZfaGFzaCA6PSBlbmNvZGUoc2hhMjU2KHBfdG9rZW46OmJ5dGVhKSwgJ2hleCcpOwoKICBTRUxFQ1QgKiBJTlRPIHZfdG9rCiAgRlJPTSBwdWJsaWMuY29udHJhdG9fYXNzaW5hdHVyYV90b2tlbnMKICBXSEVSRSB0b2tlbl9oYXNoID0gdl9oYXNoOwoKICBJRiB2X3RvayBJUyBOVUxMIFRIRU4KICAgIFJBSVNFIEVYQ0VQVElPTiAnVG9rZW4gbsOjbyBlbmNvbnRyYWRvIG91IGludsOhbGlkby4nOwogIEVORCBJRjsKCiAgLS0gQnVnIEEzIGZpeDogYmxvcXVlYXIgdG9rZW4gcmV2b2dhZG8KICBJRiB2X3Rvay5yZXZvZ2Fkb19lbSBJUyBOT1QgTlVMTCBUSEVOCiAgICBSQUlTRSBFWENFUFRJT04gJ1Rva2VuIHJldm9nYWRvIGVtICUgKG1vdGl2bzogJSkuJywgdl90b2sucmV2b2dhZG9fZW0sCiAgICAgICAgICAgICAgICAgICAgQ09BTEVTQ0Uodl90b2sucmV2b2dhY2FvX21vdGl2bywgJ27Do28gaW5mb3JtYWRvJyk7CiAgRU5EIElGOwoKICBJRiB2X3Rvay51c2Fkb19lbSBJUyBOT1QgTlVMTCBUSEVOCiAgICBSQUlTRSBFWENFUFRJT04gJ1Rva2VuIGrDoSB1dGlsaXphZG8uJzsKICBFTkQgSUY7CgogIElGIHZfdG9rLmV4cGlyYV9lbSA8IG5vdygpIFRIRU4KICAgIFJBSVNFIEVYQ0VQVElPTiAnVG9rZW4gZXhwaXJhZG8uJzsKICBFTkQgSUY7CgogIElGIHZfdG9rLnRlbnRhdGl2YXMgPiAyMCBUSEVOCiAgICBSQUlTRSBFWENFUFRJT04gJ011aXRhcyB0ZW50YXRpdmFzIHBhcmEgZXN0ZSB0b2tlbi4nOwogIEVORCBJRjsKCiAgU0VMRUNUICogSU5UTyB2X2NnIEZST00gcHVibGljLmNvbnRyYXRvc19nZXJhZG9zIFdIRVJFIGlkID0gdl90b2suY29udHJhdG9faWQ7CiAgSUYgdl9jZyBJUyBOVUxMIFRIRU4gUkFJU0UgRVhDRVBUSU9OICdDb250cmF0byBuw6NvIGVuY29udHJhZG8uJzsgRU5EIElGOwoKICBTRUxFQ1QgKiBJTlRPIHZfdHBsIEZST00gcHVibGljLmNvbnRyYXRvX3RlbXBsYXRlcyBXSEVSRSBpZCA9IHZfY2cudGVtcGxhdGVfaWQ7CgogIFVQREFURSBwdWJsaWMuY29udHJhdG9fYXNzaW5hdHVyYV90b2tlbnMgU0VUIHRlbnRhdGl2YXMgPSB0ZW50YXRpdmFzICsgMSBXSEVSRSBpZCA9IHZfdG9rLmlkOwoKICBSRVRVUk4ganNvbmJfYnVpbGRfb2JqZWN0KAogICAgJ2NvbnRyYXRvX2lkJywgICAgICB2X2NnLmlkLAogICAgJ2VtcHJlc2FfaWQnLCAgICAgICB2X2NnLmVtcHJlc2FfaWQsCiAgICAnY29sYWJvcmFkb3JfaWQnLCAgIHZfY2cuY29sYWJvcmFkb3JfaWQsCiAgICAndGlwb19jb250cmF0bycsICAgIENPQUxFU0NFKHZfdHBsLnRpcG9fY29udHJhdG8sICdkZXNjb25oZWNpZG8nKSwKICAgICdzdGF0dXMnLCAgICAgICAgICAgdl9jZy5zdGF0dXMsCiAgICAtLSBNOC4zIGZpeDogdXNhciBlbWFpbF9kZXN0aW5hdGFyaW8gKGV4aXN0ZSkgZW0gdmV6IGRlIG5vbWVfc2lnbmF0YXJpbyAobsOjbyBleGlzdGUpCiAgICAnZW1haWxfZGVzdGluYXRhcmlvJywgdl90b2suZW1haWxfZGVzdGluYXRhcmlvLAogICAgJ2V4cGlyYV9lbScsICAgICAgICB2X3Rvay5leHBpcmFfZW0sCiAgICAnaHRtbF9wcmV2aWV3JywgICAgIHZfY2cuaHRtbF9maW5hbAogICk7CkVORDsKJCQ7Cg==
+-- =============================================================================
+-- MELHORIA 13 — Correção de bugs de coluna na migração M8 (170000)
+--
+-- Detectados via teste exaustivo pós-M8:
+--
+-- M8.1 🔴 contrato_assinar_por_token: usa 'assinado_user_agent' mas a tabela
+--   contrato_assinatura_tokens tem 'assinado_ua' (nome original de 145602).
+--   → UPDATE falha com "column assinado_user_agent does not exist"
+--
+-- M8.2 🔴 contrato_assinar_por_token: armazena p_nome em 'assinado_nome',
+--   coluna que não existe na tabela. → UPDATE falha.
+--   FIX: ADD COLUMN assinado_nome text + usar coluna correta.
+--
+-- M8.3 🔴 contrato_consultar_por_token: lê v_tok.nome_signatario mas
+--   contrato_assinatura_tokens não tem essa coluna. → runtime error.
+--   FIX: retornar campo do colaborador via JOIN em contratos_gerados.
+-- =============================================================================
+
+-- M8.2 fix: adicionar coluna assinado_nome (estava sendo referenciada sem existir)
+ALTER TABLE public.contrato_assinatura_tokens
+  ADD COLUMN IF NOT EXISTS assinado_nome text;
+
+-- Reescrever contrato_assinar_por_token com nomes de coluna corretos
+CREATE OR REPLACE FUNCTION public.contrato_assinar_por_token(
+  p_token       text,
+  p_cpf         text,
+  p_nome        text,
+  p_ip          inet    DEFAULT NULL,
+  p_user_agent  text    DEFAULT NULL,
+  p_localizacao text    DEFAULT NULL,
+  p_dispositivo text    DEFAULT NULL
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_hash text;
+  v_tok  record;
+  v_cg   record;
+BEGIN
+  v_hash := encode(sha256(p_token::bytea), 'hex');
+
+  SELECT * INTO v_tok
+  FROM public.contrato_assinatura_tokens
+  WHERE token_hash = v_hash
+  FOR UPDATE;
+
+  IF v_tok IS NULL THEN
+    RAISE EXCEPTION 'Token não encontrado ou inválido.';
+  END IF;
+
+  -- Bug A2 fix: bloquear token revogado
+  IF v_tok.revogado_em IS NOT NULL THEN
+    RAISE EXCEPTION 'Token revogado em % (motivo: %).', v_tok.revogado_em,
+                    COALESCE(v_tok.revogacao_motivo, 'não informado');
+  END IF;
+
+  IF v_tok.usado_em IS NOT NULL THEN
+    RAISE EXCEPTION 'Token já utilizado em %.', v_tok.usado_em;
+  END IF;
+
+  IF v_tok.expira_em < now() THEN
+    RAISE EXCEPTION 'Token expirado em %.', v_tok.expira_em;
+  END IF;
+
+  -- Verificar CPF
+  IF v_tok.cpf_esperado IS NOT NULL AND v_tok.cpf_esperado <> p_cpf THEN
+    UPDATE public.contrato_assinatura_tokens
+    SET tentativas = tentativas + 1
+    WHERE id = v_tok.id;
+    RAISE EXCEPTION 'CPF informado não corresponde ao esperado para este token.';
+  END IF;
+
+  -- Buscar contrato
+  SELECT * INTO v_cg
+  FROM public.contratos_gerados
+  WHERE id = v_tok.contrato_id
+  FOR UPDATE;
+
+  IF v_cg IS NULL THEN
+    RAISE EXCEPTION 'Contrato não encontrado.';
+  END IF;
+
+  -- Marcar token como usado — M8.1 fix: assinado_ua (não assinado_user_agent)
+  --                            M8.2 fix: assinado_nome (agora existe via ADD COLUMN)
+  UPDATE public.contrato_assinatura_tokens
+  SET usado_em      = now(),
+      assinado_nome = p_nome,          -- M8.2: coluna adicionada acima
+      assinado_ip   = p_ip,
+      assinado_ua   = p_user_agent,    -- M8.1: era assinado_user_agent (errado)
+      tentativas    = tentativas + 1
+  WHERE id = v_tok.id;
+
+  -- Atualizar contrato
+  UPDATE public.contratos_gerados
+  SET status             = 'assinado',
+      assinado_em        = now(),
+      assinatura_metadata = jsonb_build_object(
+        'cpf',        p_cpf,
+        'nome',       p_nome,
+        'ip',         p_ip::text,
+        'user_agent', p_user_agent,
+        'localizacao', p_localizacao,
+        'dispositivo', p_dispositivo,
+        'assinado_em', now()
+      )
+  WHERE id = v_cg.id;
+
+  -- Inserir evento
+  BEGIN
+    INSERT INTO public.contrato_token_eventos(empresa_id, token_id, contrato_id, evento, detalhes, ip)
+    VALUES (v_tok.empresa_id, v_tok.id, v_tok.contrato_id, 'assinado',
+            jsonb_build_object('cpf', p_cpf, 'nome', p_nome, 'ip', p_ip::text),
+            p_ip);
+  EXCEPTION WHEN OTHERS THEN NULL; END;
+
+  -- Registrar em audit_log
+  BEGIN
+    INSERT INTO public.audit_log_unified(source_table, source_id, empresa_id, action, entity, entity_id, payload, ip_address, user_agent)
+    VALUES ('contratos_gerados', v_cg.id, v_cg.empresa_id, 'ASSINAR', 'contrato', v_cg.id::text,
+            jsonb_build_object('cpf', p_cpf, 'nome', p_nome), p_ip, p_user_agent);
+  EXCEPTION WHEN OTHERS THEN NULL; END;
+
+  RETURN jsonb_build_object(
+    'sucesso',       true,
+    'contrato_id',   v_cg.id,
+    'empresa_id',    v_cg.empresa_id,
+    'assinado_em',   now(),
+    'status',        'assinado'
+  );
+END;
+$$;
+
+-- Reescrever contrato_consultar_por_token — M8.3 fix: remover v_tok.nome_signatario
+CREATE OR REPLACE FUNCTION public.contrato_consultar_por_token(p_token text)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_hash text;
+  v_tok  record;
+  v_cg   record;
+  v_tpl  record;
+BEGIN
+  v_hash := encode(sha256(p_token::bytea), 'hex');
+
+  SELECT * INTO v_tok
+  FROM public.contrato_assinatura_tokens
+  WHERE token_hash = v_hash;
+
+  IF v_tok IS NULL THEN
+    RAISE EXCEPTION 'Token não encontrado ou inválido.';
+  END IF;
+
+  -- Bug A3 fix: bloquear token revogado
+  IF v_tok.revogado_em IS NOT NULL THEN
+    RAISE EXCEPTION 'Token revogado em % (motivo: %).', v_tok.revogado_em,
+                    COALESCE(v_tok.revogacao_motivo, 'não informado');
+  END IF;
+
+  IF v_tok.usado_em IS NOT NULL THEN
+    RAISE EXCEPTION 'Token já utilizado.';
+  END IF;
+
+  IF v_tok.expira_em < now() THEN
+    RAISE EXCEPTION 'Token expirado.';
+  END IF;
+
+  IF v_tok.tentativas > 20 THEN
+    RAISE EXCEPTION 'Muitas tentativas para este token.';
+  END IF;
+
+  SELECT * INTO v_cg FROM public.contratos_gerados WHERE id = v_tok.contrato_id;
+  IF v_cg IS NULL THEN RAISE EXCEPTION 'Contrato não encontrado.'; END IF;
+
+  SELECT * INTO v_tpl FROM public.contrato_templates WHERE id = v_cg.template_id;
+
+  UPDATE public.contrato_assinatura_tokens SET tentativas = tentativas + 1 WHERE id = v_tok.id;
+
+  RETURN jsonb_build_object(
+    'contrato_id',      v_cg.id,
+    'empresa_id',       v_cg.empresa_id,
+    'colaborador_id',   v_cg.colaborador_id,
+    'tipo_contrato',    COALESCE(v_tpl.tipo_contrato, 'desconhecido'),
+    'status',           v_cg.status,
+    -- M8.3 fix: usar email_destinatario (existe) em vez de nome_signatario (não existe)
+    'email_destinatario', v_tok.email_destinatario,
+    'expira_em',        v_tok.expira_em,
+    'html_preview',     v_cg.html_final
+  );
+END;
+$$;

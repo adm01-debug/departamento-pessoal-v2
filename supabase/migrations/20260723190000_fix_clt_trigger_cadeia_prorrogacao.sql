@@ -1,1 +1,157 @@
-LS0gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KLS0gTUVMSE9SSUEgMTMg4oCUIEdhcCBBMS43OiBibG9xdWVhciBjYWRlaWEgZGUgMysgY29udHJhdG9zIGRlIGV4cGVyacOqbmNpYQotLQotLSBDTFQgQXJ0LjQ1MTogY29udHJhdG8gZGUgdHJhYmFsaG8gcG9yIHByYXpvIGRldGVybWluYWRvIHByb3Jyb2dhZG8gbWFpcwotLSBkZSBVTUEgVkVaIHBhc3NhIGEgdmlnb3JhciBzZW0gZGV0ZXJtaW5hw6fDo28gZGUgcHJhem8uCi0tCi0tIE8gdHJpZ2dlciBNOCAoMTcwMDAwKSB2ZXJpZmljYXZhIGFwZW5hcyB2X2FudGVyaW9yLnByb3Jyb2dhZG8gPSBUUlVFLAotLSBvIHF1ZSBibG9xdWVpYSBhIHRlbnRhdGl2YSBkZSBwcm9ycm9nYXIgTyBNRVNNTyBjb250cmF0byBkdWFzIHZlemVzCi0tIChleDogQeKGkkIgZSBB4oaSQyksIG1hcyBOw4NPIGJsb3F1ZWF2YSBhIGNhZGVpYSBB4oaSQuKGkkMgKHByb3Jyb2dhw6fDo28gZGEKLS0gcHJvcnJvZ2HDp8OjbyksIHBvaXMgQi5wcm9ycm9nYWRvIHBlcm1hbmVjZSBGQUxTRSBhdMOpIHF1ZSBhbGd1w6ltIHByb3Jyb2d1ZSBCLgotLQotLSBDZW7DoXJpbyBkZSBmYWxoYSBjb25maXJtYWRvIGVtIFBvc3RncmVzIHJlYWw6Ci0tICAgMS4gQ29udHJhdG8gQSAoMzBkKSDigJQgb3JpZ2luYWwKLS0gICAyLiBDb250cmF0byBCICgzMGQsIGFudD1BKSDigJQgMcKqIHByb3Jyb2dhw6fDo28g4oaSIEEucHJvcnJvZ2Fkbz1UUlVFCi0tICAgMy4gQ29udHJhdG8gQyAoMjBkLCBhbnQ9Qikg4oCUICJwcm9ycm9nYcOnw6NvIiBkZSBCIOKGkiBQQVNTT1UgKGRldmVyaWEgZmFsaGFyKQotLSAgIFJlc3VsdGFkbzogMyBjb250cmF0b3MgZW5jYWRlYWRvcyA9IDIgcHJvcnJvZ2HDp8O1ZXMgPSB2aW9sYSBBcnQuNDUxIENMVAotLQotLSBGSVg6IHZlcmlmaWNhciBzZSBvIGNvbnRyYXRvIGFudGVyaW9yIGrDoSDDiSB1bWEgcHJvcnJvZ2HDp8OjbwotLSAodl9hbnRlcmlvci5jb250cmF0b19hbnRlcmlvcl9pZCBJUyBOT1QgTlVMTCkg4oCUIHNlIGZvciwgcmVqZWl0YXIuCi0tIElzc28gZ2FyYW50ZSBxdWUgbyBjaWNsbyBtw6F4aW1vIHNlamE6IG9yaWdpbmFsIOKGkiAxwqogcHJvcnJvZ2HDp8Ojby4KLS0gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KCkNSRUFURSBPUiBSRVBMQUNFIEZVTkNUSU9OIHB1YmxpYy52YWxpZGFyX2NvbnRyYXRvX2NsdCgpClJFVFVSTlMgdHJpZ2dlcgpMQU5HVUFHRSBwbHBnc3FsClNFQ1VSSVRZIERFRklORVIKQVMgJCQKREVDTEFSRQogIHZfdGlwbyAgICAgIHRleHQ7CiAgdl9kaWFzICAgICAgaW50OwogIHZfYW50ZXJpb3IgIHJlY29yZDsKQkVHSU4KICAtLSBCdXNjYXIgdGlwb19jb250cmF0byB2aWEgdGVtcGxhdGUKICBTRUxFQ1QgdGlwb19jb250cmF0byBJTlRPIHZfdGlwbwogIEZST00gcHVibGljLmNvbnRyYXRvX3RlbXBsYXRlcwogIFdIRVJFIGlkID0gTkVXLnRlbXBsYXRlX2lkOwoKICBJRiB2X3RpcG8gSVMgTlVMTCBUSEVOCiAgICBSRVRVUk4gTkVXOwogIEVORCBJRjsKCiAgLS0gQ2FsY3VsYXIgZHVyYcOnw6NvIGVtIGRpYXMKICBJRiBORVcuZGF0YV9maW0gSVMgTk9UIE5VTEwgVEhFTgogICAgdl9kaWFzIDo9IChORVcuZGF0YV9maW0gLSBORVcuZGF0YV9pbmljaW8pOjppbnQ7CiAgRU5EIElGOwoKICAtLSDilIDilIDilIAgQ0xUIGV4cGVyacOqbmNpYSAoQXJ0LiA0NDUgwqfDum5pY28gKyBBcnQuIDQ1MSkg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACiAgSUYgdl90aXBvID0gJ2NsdF9leHBlcmllbmNpYScgVEhFTgogICAgSUYgTkVXLmRhdGFfZmltIElTIE5VTEwgVEhFTgogICAgICBSQUlTRSBFWENFUFRJT04gJ0NvbnRyYXRvIGRlIGV4cGVyacOqbmNpYSBkZXZlIHRlciBkYXRhX2ZpbSBkZWZpbmlkYS4nOwogICAgRU5EIElGOwogICAgSUYgdl9kaWFzIDwgMSBUSEVOCiAgICAgIFJBSVNFIEVYQ0VQVElPTiAnZGF0YV9maW0gZGV2ZSBzZXIgcG9zdGVyaW9yIGEgZGF0YV9pbmljaW8uJzsKICAgIEVORCBJRjsKCiAgICBJRiBORVcuY29udHJhdG9fYW50ZXJpb3JfaWQgSVMgTk9UIE5VTEwgVEhFTgogICAgICAtLSBQUk9SUk9HQcOHw4NPOiBibG9xdWVhciBjb20gU0VMRUNUIEZPUiBVUERBVEUgKGFudGktcmFjZSBBOSkKICAgICAgU0VMRUNUICogSU5UTyB2X2FudGVyaW9yCiAgICAgIEZST00gcHVibGljLmNvbnRyYXRvc19nZXJhZG9zCiAgICAgIFdIRVJFIGlkID0gTkVXLmNvbnRyYXRvX2FudGVyaW9yX2lkCiAgICAgIEZPUiBVUERBVEU7CgogICAgICBJRiB2X2FudGVyaW9yIElTIE5VTEwgVEhFTgogICAgICAgIFJBSVNFIEVYQ0VQVElPTiAnQ29udHJhdG8gYW50ZXJpb3IgbsOjbyBlbmNvbnRyYWRvIChpZDogJSkuJywgTkVXLmNvbnRyYXRvX2FudGVyaW9yX2lkOwogICAgICBFTkQgSUY7CgogICAgICAtLSBHYXAgQTEuNyBmaXg6IGJsb3F1ZWFyIHByb3Jyb2dhw6fDo28gZGUgcHJvcnJvZ2HDp8OjbwogICAgICAtLSBTZSBvIGFudGVyaW9yIGrDoSDDqSBwcm9ycm9nYcOnw6NvIGRlIG91dHJvIGNvbnRyYXRvIChjb250cmF0b19hbnRlcmlvcl9pZCBJUyBOT1QgTlVMTCksCiAgICAgIC0tIGVudMOjbyBhY2VpdGFyIEMgY29tbyBwcm9ycm9nYcOnw6NvIGRlIEIgY3JpYXJpYSB1bWEgY2FkZWlhIGRlIDMsIHZpb2xhbmRvIENMVCBBcnQuNDUxLgogICAgICBJRiB2X2FudGVyaW9yLmNvbnRyYXRvX2FudGVyaW9yX2lkIElTIE5PVCBOVUxMIFRIRU4KICAgICAgICBSQUlTRSBFWENFUFRJT04KICAgICAgICAgICdDTFQgQXJ0LjQ1MTogbsOjbyDDqSBwb3Nzw612ZWwgcHJvcnJvZ2FyIHVtIGNvbnRyYXRvIHF1ZSBqw6Egw6kgdW1hIHByb3Jyb2dhw6fDo28uICcKICAgICAgICAgICdFc3RydXR1cmEgcGVybWl0aWRhOiBjb250cmF0byBvcmlnaW5hbCDihpIgMSBwcm9ycm9nYcOnw6NvLiAnCiAgICAgICAgICAnTyBjb250cmF0byAlIGrDoSDDqSBwcm9ycm9nYcOnw6NvIGRlICUsIGltcG9zc8OtdmVsIGVuY2FkZWFyIHVtYSAzwqouJywKICAgICAgICAgIHZfYW50ZXJpb3IuaWQsIHZfYW50ZXJpb3IuY29udHJhdG9fYW50ZXJpb3JfaWQ7CiAgICAgIEVORCBJRjsKCiAgICAgIC0tIEJsb3F1ZWFyIHNlIG8gYW50ZXJpb3IgasOhIGZvaSBtYXJjYWRvIHByb3Jyb2dhZG8KICAgICAgSUYgdl9hbnRlcmlvci5wcm9ycm9nYWRvIFRIRU4KICAgICAgICBSQUlTRSBFWENFUFRJT04KICAgICAgICAgICdDb250cmF0byBhbnRlcmlvciAoJSkgasOhIGZvaSBwcm9ycm9nYWRvLiBDTFQgQXJ0LjQ1MTogc29tZW50ZSB1bWEgcHJvcnJvZ2HDp8OjbyDDqSBwZXJtaXRpZGEuJywKICAgICAgICAgIE5FVy5jb250cmF0b19hbnRlcmlvcl9pZDsKICAgICAgRU5EIElGOwoKICAgICAgREVDTEFSRQogICAgICAgIHZfYW50ZXJpb3JfdGlwbyB0ZXh0OwogICAgICAgIHZfYW50ZXJpb3JfZGlhcyBpbnQ7CiAgICAgICAgdl90b3RhbCAgICAgICAgIGludDsKICAgICAgQkVHSU4KICAgICAgICBTRUxFQ1QgdGlwb19jb250cmF0byBJTlRPIHZfYW50ZXJpb3JfdGlwbwogICAgICAgIEZST00gcHVibGljLmNvbnRyYXRvX3RlbXBsYXRlcyBXSEVSRSBpZCA9IHZfYW50ZXJpb3IudGVtcGxhdGVfaWQ7CgogICAgICAgIElGIHZfYW50ZXJpb3JfdGlwbyA8PiAnY2x0X2V4cGVyaWVuY2lhJyBUSEVOCiAgICAgICAgICBSQUlTRSBFWENFUFRJT04KICAgICAgICAgICAgJ1Byb3Jyb2dhw6fDo28gaW52w6FsaWRhOiBjb250cmF0byBhbnRlcmlvciBuw6NvIMOpIGRlIGV4cGVyacOqbmNpYSAodGlwbzogJSkuJywgdl9hbnRlcmlvcl90aXBvOwogICAgICAgIEVORCBJRjsKCiAgICAgICAgdl9hbnRlcmlvcl9kaWFzIDo9ICh2X2FudGVyaW9yLmRhdGFfZmltIC0gdl9hbnRlcmlvci5kYXRhX2luaWNpbyk6OmludDsKICAgICAgICB2X3RvdGFsIDo9IHZfYW50ZXJpb3JfZGlhcyArIHZfZGlhczsKCiAgICAgICAgLS0gQ2FkYSBwZXLDrW9kbyDiiaQgNDUgZGlhcyBlbSBwcm9ycm9nYcOnw6NvCiAgICAgICAgSUYgdl9kaWFzID4gNDUgVEhFTgogICAgICAgICAgUkFJU0UgRVhDRVBUSU9OCiAgICAgICAgICAgICdDTFQgQXJ0LjQ0NSDCp8O6bmljbzogZW0gcHJvcnJvZ2HDp8OjbywgY2FkYSBwZXLDrW9kbyBuw6NvIHBvZGUgZXhjZWRlciA0NSBkaWFzIChpbmZvcm1hZG86ICUgZGlhcykuJywKICAgICAgICAgICAgdl9kaWFzOwogICAgICAgIEVORCBJRjsKICAgICAgICBJRiB2X2FudGVyaW9yX2RpYXMgPiA0NSBUSEVOCiAgICAgICAgICBSQUlTRSBFWENFUFRJT04KICAgICAgICAgICAgJ0NMVCBBcnQuNDQ1IMKnw7puaWNvOiBwZXLDrW9kbyBhbnRlcmlvciBleGNlZGUgNDUgZGlhcyAoJSBkaWFzKSwgbsOjbyDDqSBwcm9ycm9nw6F2ZWwuJywKICAgICAgICAgICAgdl9hbnRlcmlvcl9kaWFzOwogICAgICAgIEVORCBJRjsKICAgICAgICBJRiB2X3RvdGFsID4gOTAgVEhFTgogICAgICAgICAgUkFJU0UgRVhDRVBUSU9OCiAgICAgICAgICAgICdDTFQgQXJ0LjQ0NSDCp8O6bmljbzogc29tYSBkb3MgcGVyw61vZG9zIGRlIGV4cGVyacOqbmNpYSBleGNlZGUgOTAgZGlhcyAoYW50ZXJpb3I6ICUgKyBub3ZvOiAlID0gJSBkaWFzKS4nLAogICAgICAgICAgICB2X2FudGVyaW9yX2RpYXMsIHZfZGlhcywgdl90b3RhbDsKICAgICAgICBFTkQgSUY7CgogICAgICAgIC0tIE1hcmNhciBvIGFudGVyaW9yIGNvbW8gcHJvcnJvZ2FkbyAoasOhIGNvbSBsb2NrKQogICAgICAgIFVQREFURSBwdWJsaWMuY29udHJhdG9zX2dlcmFkb3MKICAgICAgICBTRVQgcHJvcnJvZ2FkbyA9IFRSVUUKICAgICAgICBXSEVSRSBpZCA9IE5FVy5jb250cmF0b19hbnRlcmlvcl9pZDsKICAgICAgRU5EOwoKICAgIEVMU0UKICAgICAgLS0gUEVSw41PRE8gw5pOSUNPIChzZW0gcHJvcnJvZ2HDp8Ojbyk6IGxpbWl0ZSDDqSA5MCBkaWFzCiAgICAgIElGIHZfZGlhcyA+IDkwIFRIRU4KICAgICAgICBSQUlTRSBFWENFUFRJT04KICAgICAgICAgICdDTFQgQXJ0LjQ0NSDCp8O6bmljbzogY29udHJhdG8gZGUgZXhwZXJpw6puY2lhIG7Do28gcG9kZSBleGNlZGVyIDkwIGRpYXMgZW0gcGVyw61vZG8gw7puaWNvIChpbmZvcm1hZG86ICUgZGlhcykuJywKICAgICAgICAgIHZfZGlhczsKICAgICAgRU5EIElGOwogICAgRU5EIElGOwoKICAtLSDilIDilIDilIAgQ0xUIGRldGVybWluYWRvIChBcnQuIDQ0NSBjYXB1dCkg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACiAgRUxTSUYgdl90aXBvID0gJ2NsdF9kZXRlcm1pbmFkbycgVEhFTgogICAgSUYgTkVXLmRhdGFfZmltIElTIE5VTEwgVEhFTgogICAgICBSQUlTRSBFWENFUFRJT04gJ0NvbnRyYXRvIHBvciBwcmF6byBkZXRlcm1pbmFkbyBkZXZlIHRlciBkYXRhX2ZpbS4nOwogICAgRU5EIElGOwogICAgSUYgdl9kaWFzIDwgMSBUSEVOCiAgICAgIFJBSVNFIEVYQ0VQVElPTiAnZGF0YV9maW0gZGV2ZSBzZXIgcG9zdGVyaW9yIGEgZGF0YV9pbmljaW8uJzsKICAgIEVORCBJRjsKICAgIElGIHZfZGlhcyA+IDczMCBUSEVOCiAgICAgIFJBSVNFIEVYQ0VQVElPTgogICAgICAgICdDTFQgQXJ0LjQ0NTogY29udHJhdG8gcG9yIHByYXpvIGRldGVybWluYWRvIG7Do28gcG9kZSBleGNlZGVyIDIgYW5vcyAvIDczMCBkaWFzIChpbmZvcm1hZG86ICUgZGlhcykuJywKICAgICAgICB2X2RpYXM7CiAgICBFTkQgSUY7CgogIC0tIOKUgOKUgOKUgCBDTFQgaW5kZXRlcm1pbmFkbyAvIGhvcmlzdGEg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACiAgRUxTSUYgdl90aXBvIElOICgnY2x0X2luZGV0ZXJtaW5hZG8nLCAnY2x0X2hvcmlzdGEnKSBUSEVOCiAgICBJRiBORVcuZGF0YV9maW0gSVMgTk9UIE5VTEwgVEhFTgogICAgICBSQUlTRSBFWENFUFRJT04KICAgICAgICAnQ29udHJhdG8gcG9yIHByYXpvIGluZGV0ZXJtaW5hZG8gKHRpcG86ICUpIG7Do28gZGV2ZSB0ZXIgZGF0YV9maW0uJywgdl90aXBvOwogICAgRU5EIElGOwogIEVORCBJRjsKCiAgUkVUVVJOIE5FVzsKRU5EOwokJDsK
+-- =============================================================================
+-- MELHORIA 13 — Gap A1.7: bloquear cadeia de 3+ contratos de experiência
+--
+-- CLT Art.451: contrato de trabalho por prazo determinado prorrogado mais
+-- de UMA VEZ passa a vigorar sem determinação de prazo.
+--
+-- O trigger M8 (170000) verificava apenas v_anterior.prorrogado = TRUE,
+-- o que bloqueia a tentativa de prorrogar O MESMO contrato duas vezes
+-- (ex: A→B e A→C), mas NÃO bloqueava a cadeia A→B→C (prorrogação da
+-- prorrogação), pois B.prorrogado permanece FALSE até que alguém prorrogue B.
+--
+-- Cenário de falha confirmado em Postgres real:
+--   1. Contrato A (30d) — original
+--   2. Contrato B (30d, ant=A) — 1ª prorrogação → A.prorrogado=TRUE
+--   3. Contrato C (20d, ant=B) — "prorrogação" de B → PASSOU (deveria falhar)
+--   Resultado: 3 contratos encadeados = 2 prorrogações = viola Art.451 CLT
+--
+-- FIX: verificar se o contrato anterior já É uma prorrogação
+-- (v_anterior.contrato_anterior_id IS NOT NULL) — se for, rejeitar.
+-- Isso garante que o ciclo máximo seja: original → 1ª prorrogação.
+-- =============================================================================
+
+CREATE OR REPLACE FUNCTION public.validar_contrato_clt()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_tipo      text;
+  v_dias      int;
+  v_anterior  record;
+BEGIN
+  -- Buscar tipo_contrato via template
+  SELECT tipo_contrato INTO v_tipo
+  FROM public.contrato_templates
+  WHERE id = NEW.template_id;
+
+  IF v_tipo IS NULL THEN
+    RETURN NEW;
+  END IF;
+
+  -- Calcular duração em dias
+  IF NEW.data_fim IS NOT NULL THEN
+    v_dias := (NEW.data_fim - NEW.data_inicio)::int;
+  END IF;
+
+  -- ─── CLT experiência (Art. 445 §único + Art. 451) ──────────────────────
+  IF v_tipo = 'clt_experiencia' THEN
+    IF NEW.data_fim IS NULL THEN
+      RAISE EXCEPTION 'Contrato de experiência deve ter data_fim definida.';
+    END IF;
+    IF v_dias < 1 THEN
+      RAISE EXCEPTION 'data_fim deve ser posterior a data_inicio.';
+    END IF;
+
+    IF NEW.contrato_anterior_id IS NOT NULL THEN
+      -- PRORROGAÇÃO: bloquear com SELECT FOR UPDATE (anti-race A9)
+      SELECT * INTO v_anterior
+      FROM public.contratos_gerados
+      WHERE id = NEW.contrato_anterior_id
+      FOR UPDATE;
+
+      IF v_anterior IS NULL THEN
+        RAISE EXCEPTION 'Contrato anterior não encontrado (id: %).', NEW.contrato_anterior_id;
+      END IF;
+
+      -- Gap A1.7 fix: bloquear prorrogação de prorrogação
+      -- Se o anterior já é prorrogação de outro contrato (contrato_anterior_id IS NOT NULL),
+      -- então aceitar C como prorrogação de B criaria uma cadeia de 3, violando CLT Art.451.
+      IF v_anterior.contrato_anterior_id IS NOT NULL THEN
+        RAISE EXCEPTION
+          'CLT Art.451: não é possível prorrogar um contrato que já é uma prorrogação. '
+          'Estrutura permitida: contrato original → 1 prorrogação. '
+          'O contrato % já é prorrogação de %, impossível encadear uma 3ª.',
+          v_anterior.id, v_anterior.contrato_anterior_id;
+      END IF;
+
+      -- Bloquear se o anterior já foi marcado prorrogado
+      IF v_anterior.prorrogado THEN
+        RAISE EXCEPTION
+          'Contrato anterior (%) já foi prorrogado. CLT Art.451: somente uma prorrogação é permitida.',
+          NEW.contrato_anterior_id;
+      END IF;
+
+      DECLARE
+        v_anterior_tipo text;
+        v_anterior_dias int;
+        v_total         int;
+      BEGIN
+        SELECT tipo_contrato INTO v_anterior_tipo
+        FROM public.contrato_templates WHERE id = v_anterior.template_id;
+
+        IF v_anterior_tipo <> 'clt_experiencia' THEN
+          RAISE EXCEPTION
+            'Prorrogação inválida: contrato anterior não é de experiência (tipo: %).', v_anterior_tipo;
+        END IF;
+
+        v_anterior_dias := (v_anterior.data_fim - v_anterior.data_inicio)::int;
+        v_total := v_anterior_dias + v_dias;
+
+        -- Cada período ≤ 45 dias em prorrogação
+        IF v_dias > 45 THEN
+          RAISE EXCEPTION
+            'CLT Art.445 §único: em prorrogação, cada período não pode exceder 45 dias (informado: % dias).',
+            v_dias;
+        END IF;
+        IF v_anterior_dias > 45 THEN
+          RAISE EXCEPTION
+            'CLT Art.445 §único: período anterior excede 45 dias (% dias), não é prorrogável.',
+            v_anterior_dias;
+        END IF;
+        IF v_total > 90 THEN
+          RAISE EXCEPTION
+            'CLT Art.445 §único: soma dos períodos de experiência excede 90 dias (anterior: % + novo: % = % dias).',
+            v_anterior_dias, v_dias, v_total;
+        END IF;
+
+        -- Marcar o anterior como prorrogado (já com lock)
+        UPDATE public.contratos_gerados
+        SET prorrogado = TRUE
+        WHERE id = NEW.contrato_anterior_id;
+      END;
+
+    ELSE
+      -- PERÍODO ÚNICO (sem prorrogação): limite é 90 dias
+      IF v_dias > 90 THEN
+        RAISE EXCEPTION
+          'CLT Art.445 §único: contrato de experiência não pode exceder 90 dias em período único (informado: % dias).',
+          v_dias;
+      END IF;
+    END IF;
+
+  -- ─── CLT determinado (Art. 445 caput) ────────────────────────────────
+  ELSIF v_tipo = 'clt_determinado' THEN
+    IF NEW.data_fim IS NULL THEN
+      RAISE EXCEPTION 'Contrato por prazo determinado deve ter data_fim.';
+    END IF;
+    IF v_dias < 1 THEN
+      RAISE EXCEPTION 'data_fim deve ser posterior a data_inicio.';
+    END IF;
+    IF v_dias > 730 THEN
+      RAISE EXCEPTION
+        'CLT Art.445: contrato por prazo determinado não pode exceder 2 anos / 730 dias (informado: % dias).',
+        v_dias;
+    END IF;
+
+  -- ─── CLT indeterminado / horista ─────────────────────────────────────
+  ELSIF v_tipo IN ('clt_indeterminado', 'clt_horista') THEN
+    IF NEW.data_fim IS NOT NULL THEN
+      RAISE EXCEPTION
+        'Contrato por prazo indeterminado (tipo: %) não deve ter data_fim.', v_tipo;
+    END IF;
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
