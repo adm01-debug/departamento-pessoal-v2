@@ -126,7 +126,7 @@ export async function beginIdempotency(
   // Colisão — carrega registro existente
   const { data: existing } = await admin
     .from("idempotency_keys")
-    .select("id, request_hash, status, response_status, response_body, expires_at")
+    .select("id, request_hash, status, response_status, response_body, expires_at, created_at")
     .eq("endpoint", params.endpoint)
     .eq("key_hash", keyHash)
     .maybeSingle();
@@ -161,18 +161,33 @@ export async function beginIdempotency(
   }
 
   if (existing.status === "in_progress") {
-    return {
-      skipped: false,
-      reason: 'IN_PROGRESS',
-      existingId: existing.id,
-      keyHash,
-      requestHash,
-      conflict: createErrorResponse(
-        "Requisição idempotente em andamento — tente novamente em instantes",
-        409,
-        "IDEMPOTENCY_IN_PROGRESS",
-      ),
-    };
+    // Registros in_progress com mais de 5 minutos são considerados zumbis (função caiu sem completar).
+    // Reutilizamos o registro para evitar deadlock permanente.
+    const IN_PROGRESS_TTL_MS = 5 * 60 * 1000;
+    const createdAt = existing.created_at ? new Date(existing.created_at).getTime() : null;
+    const isStale = createdAt !== null && (Date.now() - createdAt) > IN_PROGRESS_TTL_MS;
+
+    if (!isStale) {
+      return {
+        skipped: false,
+        reason: 'IN_PROGRESS',
+        existingId: existing.id,
+        keyHash,
+        requestHash,
+        conflict: createErrorResponse(
+          "Requisição idempotente em andamento — tente novamente em instantes",
+          409,
+          "IDEMPOTENCY_IN_PROGRESS",
+        ),
+      };
+    }
+
+    // Registro zumbi — reprocessar como nova tentativa após falha
+    await admin
+      .from("idempotency_keys")
+      .update({ status: "in_progress", request_hash: requestHash, response_body: null, response_status: null, completed_at: null })
+      .eq("id", existing.id);
+    return { skipped: false, id: existing.id, reason: 'RETRY_AFTER_FAILURE', existingId: existing.id, keyHash, requestHash };
   }
 
   if (existing.status === "completed" && existing.response_body) {
