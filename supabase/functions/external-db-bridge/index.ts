@@ -1,5 +1,5 @@
 // external-db-bridge — Hardened gateway (Onda 36)
-// Segurança: JWT via getClaims() para writes, tenant scope (empresa_id),
+// Segurança: JWT via getUser() para writes, tenant scope (empresa_id),
 // denylist de tabelas sensíveis, allowlist de RPC e operadores, validação
 // estrita de identificadores, CSRF fail-closed, no-store, payload cap.
 //
@@ -331,10 +331,11 @@ Deno.serve(async (req) => {
       try {
         const localClient = createClient(supabaseUrl, supabaseAnonKey, {
           global: { headers: { Authorization: authHeader } },
+          auth: { persistSession: false, autoRefreshToken: false },
         });
-        const { data, error } = await (localClient.auth as unknown as { getClaims: (t: string) => Promise<{ data: { claims?: { sub?: string } } | null; error: unknown }> }).getClaims(token);
-        if (!error && data?.claims?.sub) {
-          user = { id: String(data.claims.sub) };
+        const { data, error } = await localClient.auth.getUser();
+        if (!error && data?.user?.id) {
+          user = { id: data.user.id };
         }
       } catch { /* segue anônimo */ }
     }

@@ -92,13 +92,11 @@ Deno.serve(async (req) => {
       global: { headers: { Authorization: authHeader } },
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const { data: claims, error: claimsErr } = await userClient.auth.getClaims(
-      authHeader.replace('Bearer ', ''),
-    );
-    if (claimsErr || !claims?.claims?.sub) {
+    const { data: claims, error: claimsErr } = await userClient.auth.getUser();
+    if (claimsErr || !claims?.user?.id) {
       return createErrorResponse('Sessão inválida', 401, 'UNAUTHORIZED');
     }
-    const userId = claims.claims.sub as string;
+    const userId = claims.user.id;
 
     let raw: unknown;
     const { body: _pb, errorResponse: _pe } = await parseJsonBody(req);
