@@ -23,7 +23,7 @@ export const calculoLoteService = {
     try {
       const [ano, mes] = competencia.split('-');
       const dataInicio = `${ano}-${mes}-01`;
-      const dataFim = `${ano}-${mes}-31`; // Simplificado para busca
+      const dataFim = new Date(Number(ano), Number(mes), 0).toISOString().slice(0, 10);
 
       // 1. Buscar colaboradores ativos da empresa
       const { data: colaboradores, error: colabError } = await (supabase as any)

@@ -128,6 +128,8 @@ function getServiceClient() {
   return createClient(localUrl, serviceKey);
 }
 
+const TELEMETRY_BUFFER_CAP = 500; // evita crescimento ilimitado em modo degradado
+
 async function flushTelemetry(): Promise<void> {
   if (telemetryBuffer.length === 0) return;
   if (telemetryFlushInFlight) return telemetryFlushInFlight;
@@ -135,14 +137,26 @@ async function flushTelemetry(): Promise<void> {
   const batch = telemetryBuffer.splice(0, telemetryBuffer.length);
   telemetryLastFlush = Date.now();
   const client = getServiceClient();
-  if (!client) return;
+  if (!client) {
+    // Sem client disponível — devolve itens ao buffer (com cap para evitar OOM)
+    const keep = batch.slice(0, TELEMETRY_BUFFER_CAP - telemetryBuffer.length);
+    telemetryBuffer.unshift(...keep);
+    return;
+  }
 
   telemetryFlushInFlight = (async () => {
     try {
       const { error } = await client.from("query_telemetry").insert(batch);
-      if (error) console.warn("[telemetry-batch] persist falhou:", error.message);
+      if (error) {
+        console.warn("[telemetry-batch] persist falhou:", error.message);
+        // Devolve ao buffer para nova tentativa (com cap para evitar OOM)
+        const keep = batch.slice(0, Math.max(0, TELEMETRY_BUFFER_CAP - telemetryBuffer.length));
+        telemetryBuffer.unshift(...keep);
+      }
     } catch (e) {
       console.warn("[telemetry-batch] exceção:", (e as Error).message);
+      const keep = batch.slice(0, Math.max(0, TELEMETRY_BUFFER_CAP - telemetryBuffer.length));
+      telemetryBuffer.unshift(...keep);
     } finally {
       telemetryFlushInFlight = null;
     }
