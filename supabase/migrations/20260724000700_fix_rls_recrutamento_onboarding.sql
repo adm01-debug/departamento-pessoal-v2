@@ -26,7 +26,7 @@ BEGIN
       WHERE table_schema = 'public' AND table_name = t_name
     ) THEN
       EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t_name);
-      EXECUTE format('DROP POLICY IF EXISTS %L ON public.%I', 'Multi-tenant access', t_name);
+      EXECUTE format('DROP POLICY IF EXISTS %I ON public.%I', 'Multi-tenant access', t_name);
       EXECUTE format(
         'CREATE POLICY %I ON public.%I FOR ALL TO authenticated '
         'USING (empresa_id = public.get_auth_empresa_id()) '
