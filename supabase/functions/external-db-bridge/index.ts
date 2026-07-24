@@ -384,10 +384,20 @@ Deno.serve(async (req) => {
     .map((f) => ({ ...f, value: sanitizeData(f.value) }))
     .filter((f) => f.op === "or" || (f.value !== null && f.value !== undefined && f.value !== "" && f.value !== "all"));
 
-  // Validação: writes exigem auth
+  // Validação: writes e RPCs protegidas exigem auth
   const isWrite = action === "insert" || action === "update" || action === "delete" || action === "upsert";
-  if (isWrite && !user) {
-    return jsonError(401, "UNAUTHORIZED", "Authentication required for write operations");
+  // RPCs públicas: chamadas antes/fora de sessão de usuário (login protection + onboarding).
+  // Todos os demais RPCs do allowlist operam sobre dados tenant-scoped e requerem auth.
+  const PUBLIC_RPCS = new Set<string>([
+    "check_login_lock", "record_failed_login", "reset_login_attempts",
+    "check_account_lockout", "record_login_attempt", "reset_account_lockout",
+    "check_brute_force", "check_rate_limit", "is_ip_blocked", "is_ip_whitelisted",
+    "is_country_allowed",
+    "get_admissao_por_token",
+  ]);
+  const isProtectedRpc = action === "rpc" && rpcName != null && !PUBLIC_RPCS.has(rpcName);
+  if ((isWrite || isProtectedRpc) && !user) {
+    return jsonError(401, "UNAUTHORIZED", "Authentication required for this operation");
   }
 
   // Rate limit — bridge é o endpoint mais genérico: 100 req/min para reads, 30 req/min para writes

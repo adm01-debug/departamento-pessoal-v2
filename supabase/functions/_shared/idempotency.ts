@@ -102,7 +102,8 @@ export async function beginIdempotency(
     };
   }
 
-  const keyHash = await sha256Hex(`${params.endpoint}:${rawKey}`);
+  // T005: incluir empresaId para evitar colisão cross-tenant com mesma chave e endpoint
+  const keyHash = await sha256Hex(`${params.endpoint}:${params.empresaId ?? ""}:${rawKey}`);
   const requestHash = await sha256Hex(canonicalize(params.requestBody ?? null));
 
   // Tenta INSERT — se colidir (unique), lemos o existente.
@@ -182,11 +183,30 @@ export async function beginIdempotency(
       };
     }
 
-    // Registro zumbi — reprocessar como nova tentativa após falha
-    await admin
+    // Registro zumbi — reclamar atomicamente (Codex P1: sem SELECT-then-UPDATE separado).
+    // O WHERE status='in_progress' garante que apenas um worker ganha a corrida.
+    const { data: claimed } = await admin
       .from("idempotency_keys")
       .update({ status: "in_progress", request_hash: requestHash, response_body: null, response_status: null, completed_at: null })
-      .eq("id", existing.id);
+      .eq("id", existing.id)
+      .eq("status", "in_progress")
+      .select("id")
+      .maybeSingle();
+    if (!claimed?.id) {
+      // Outro worker reclamou primeiro — rejeitar como in_progress
+      return {
+        skipped: false,
+        reason: 'IN_PROGRESS',
+        existingId: existing.id,
+        keyHash,
+        requestHash,
+        conflict: createErrorResponse(
+          "Requisição idempotente em andamento — tente novamente em instantes",
+          409,
+          "IDEMPOTENCY_IN_PROGRESS",
+        ),
+      };
+    }
     return { skipped: false, id: existing.id, reason: 'RETRY_AFTER_FAILURE', existingId: existing.id, keyHash, requestHash };
   }
 
