@@ -1,12 +1,27 @@
 import { supabase } from '@/integrations/supabase/client';
 
-// Parse PostgreSQL INTERVAL string (e.g. "08:00:00", "01:30:00") to decimal hours
+// Parse PostgreSQL INTERVAL string to decimal hours.
+// Handles "HH:MM:SS", "D days HH:MM:SS", "D days", "-01:30:00", etc.
 function parseIntervalToHours(interval: string | null | undefined): number {
   if (!interval) return 0;
-  const parts = String(interval).split(':');
-  if (parts.length < 2) return parseFloat(interval) || 0;
-  const [h, m, s] = parts.map(Number);
-  return h + (m || 0) / 60 + (s || 0) / 3600;
+  const str = String(interval);
+
+  let days = 0;
+  const dayMatch = str.match(/(-?\d+)\s+days?/);
+  if (dayMatch) days = parseInt(dayMatch[1], 10);
+
+  let timeHours = 0;
+  const timeMatch = str.match(/(-?\d+):(\d+):(\d+)/);
+  if (timeMatch) {
+    const h = parseInt(timeMatch[1], 10);
+    const m = parseInt(timeMatch[2], 10);
+    const s = parseInt(timeMatch[3], 10);
+    timeHours = h + m / 60 + s / 3600;
+  } else if (!dayMatch) {
+    return parseFloat(str) || 0;
+  }
+
+  return days * 24 + timeHours;
 }
 
 export const bancoHorasService = {

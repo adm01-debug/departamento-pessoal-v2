@@ -135,6 +135,23 @@ describe('bancoHorasService', () => {
       expect(saldo).toBe(5); // 0 + 5
     });
 
+    it('handles PostgreSQL interval with day component (e.g. "1 day 02:00:00")', async () => {
+      setupSaldo([
+        { tipo: 'credito', horas: '1 day 02:00:00' }, // 26h
+        { tipo: 'debito', horas: '2:00:00' },          // 2h
+      ]);
+      const saldo = await bancoHorasService.getSaldo('colab-1');
+      expect(saldo).toBeCloseTo(24, 5); // 26 - 2
+    });
+
+    it('handles PostgreSQL interval with days only (e.g. "2 days")', async () => {
+      setupSaldo([
+        { tipo: 'credito', horas: '2 days' }, // 48h
+      ]);
+      const saldo = await bancoHorasService.getSaldo('colab-1');
+      expect(saldo).toBe(48);
+    });
+
     it('throws when supabase returns error', async () => {
       setupSaldo(null, { message: 'DB error' });
       await expect(bancoHorasService.getSaldo('colab-1')).rejects.toBeDefined();
