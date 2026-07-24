@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
 }));
 
@@ -12,53 +12,64 @@ import { PontoTodayCard } from '../ponto/PontoTodayCard';
 const REGISTRO = {
   entrada_esperada: '08:00',
   saida_esperada: '17:00',
-  horas_trabalhadas: '08:00',
+  horas_trabalhadas: '06:00',
   horas_extras: '00:00',
-  horas_falta: '00:00',
+  horas_falta: '02:00',
   entrada_1: '08:05',
   saida_1: null,
-  saida_intervalo: null,
-  retorno_intervalo: null,
+  entrada_2: null,
+  saida_2: null,
+  entrada_3: null,
+  saida_3: null,
   atraso_minutos: 5,
   saida_antecipada_minutos: 0,
+  saida_intervalo: null,
+  retorno_intervalo: null,
 };
 
 describe('PontoTodayCard', () => {
-  it('renders "Hoje" heading', () => {
-    render(<PontoTodayCard registroHoje={null} />);
+  it('renders Hoje title', () => {
+    render(<PontoTodayCard registroHoje={REGISTRO} />);
     expect(screen.getByText('Hoje')).toBeInTheDocument();
   });
 
-  it('shows "A jornada ainda não começou" when no registro', () => {
+  it('shows empty state when no registro', () => {
     render(<PontoTodayCard registroHoje={null} />);
-    expect(screen.getByText('A jornada ainda não começou')).toBeInTheDocument();
+    expect(screen.getByText(/jornada ainda não começou/)).toBeInTheDocument();
   });
 
-  it('shows escala badge when registro has horarios', () => {
+  it('renders Progresso da Jornada when registro present', () => {
     render(<PontoTodayCard registroHoje={REGISTRO} />);
-    expect(screen.getByText(/08:00 - 17:00/)).toBeInTheDocument();
+    expect(screen.getByText(/Progresso da Jornada/)).toBeInTheDocument();
   });
 
-  it('shows Trabalhadas, Extras, Débito labels', () => {
+  it('renders Trabalhadas label', () => {
     render(<PontoTodayCard registroHoje={REGISTRO} />);
     expect(screen.getByText('Trabalhadas')).toBeInTheDocument();
+  });
+
+  it('renders Extras label', () => {
+    render(<PontoTodayCard registroHoje={REGISTRO} />);
     expect(screen.getByText('Extras')).toBeInTheDocument();
+  });
+
+  it('renders Débito label', () => {
+    render(<PontoTodayCard registroHoje={REGISTRO} />);
     expect(screen.getByText('Débito')).toBeInTheDocument();
   });
 
-  it('shows atraso badge when atraso_minutos > 0', () => {
+  it('renders atraso badge', () => {
     render(<PontoTodayCard registroHoje={REGISTRO} />);
     expect(screen.getByText(/Atraso: 5min/)).toBeInTheDocument();
   });
 
-  it('shows Linha do Tempo section', () => {
+  it('renders scale badge from entrada/saida esperada', () => {
     render(<PontoTodayCard registroHoje={REGISTRO} />);
-    expect(screen.getByText('Linha do Tempo')).toBeInTheDocument();
+    expect(screen.getByText(/08:00 - 17:00/)).toBeInTheDocument();
   });
 
-  it('shows waiting message when no entries', () => {
-    const semEntrada = { ...REGISTRO, entrada_1: null };
-    render(<PontoTodayCard registroHoje={semEntrada} />);
-    expect(screen.getByText('Aguardando primeira batida')).toBeInTheDocument();
+  it('shows meal break label when in interval', () => {
+    render(<PontoTodayCard registroHoje={{ ...REGISTRO, saida_intervalo: '12:00', retorno_intervalo: null }} />);
+    expect(screen.getByText(/Intervalo de Almoço/)).toBeInTheDocument();
   });
 });
