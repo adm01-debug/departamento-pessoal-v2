@@ -242,9 +242,14 @@ Deno.serve(async (req) => {
     //    salário e 13º (bases distintas, cada um com sua própria dedução
     //    simplificada); férias/aviso indenizados são isentos.
     const totalProventos = round2(saldoSalario + avisoIndenizado + feriasVencidasValor + feriasProporcional + tercoFerias + decimoTerceiro);
-    // IN RFB 2110/2022: truncar na 2ª casa, mesmo na soma de duas bases distintas
-    const inss = trunc2(calcINSS(saldoSalario) + calcINSS(decimoTerceiro));
-    const irrf = trunc2(calcIRRF(saldoSalario, dependentes_irrf) + calcIRRF(decimoTerceiro, 0));
+    // IN RFB 2110/2022: truncar na 2ª casa por base. Soma em inteiros de centavos
+    // para evitar underflow IEEE754 (ex: 0.1+0.7=0.7999... → trunc2 droparia 1 centavo).
+    const inssA = calcINSS(saldoSalario);
+    const inssB = calcINSS(decimoTerceiro);
+    const inss = (Math.round(inssA * 100) + Math.round(inssB * 100)) / 100;
+    const irrfA = calcIRRF(saldoSalario, dependentes_irrf);
+    const irrfB = calcIRRF(decimoTerceiro, 0);
+    const irrf = (Math.round(irrfA * 100) + Math.round(irrfB * 100)) / 100;
     const totalDescontos = round2(inss + irrf);
     const totalLiquido = round2(totalProventos - totalDescontos + multaFGTS);
 
