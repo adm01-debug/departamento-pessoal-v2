@@ -212,7 +212,9 @@ Deno.serve(async (req) => {
     if (tipo !== 'justa_causa') {
       feriasProporcional = round2((salario_base / 12) * (mesesFerias % 12 || (mesesFerias > 0 ? 12 : 0)));
     }
-    const feriasVencidasValor = ferias_vencidas && tipo !== 'justa_causa' ? salario_base : 0;
+    // Art. 146 CLT: férias vencidas são devidas "qualquer que seja a causa" — inclusive justa_causa.
+    // Apenas férias proporcionais são perdidas em justa_causa (Art. 147 CLT).
+    const feriasVencidasValor = ferias_vencidas ? salario_base : 0;
     const tercoFerias = round2((feriasProporcional + feriasVencidasValor) / 3);
 
     // 4. 13º proporcional (Lei 4.090/62) — avos a partir do início do

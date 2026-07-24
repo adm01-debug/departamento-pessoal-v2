@@ -242,9 +242,16 @@ describe('calcularRescisao — Justa Causa', () => {
     expect((await calcularRescisao(base)).tercoFerias).toBe(0);
   });
 
-  it('férias vencidas = 0 em justa causa', async () => {
+  it('férias vencidas = salário em justa causa (Art. 146 CLT — "qualquer que seja a causa")', async () => {
     const r = await calcularRescisao({ ...base, feriasVencidas: true });
-    expect(r.feriasVencidas).toBe(0);
+    expect(r.feriasVencidas).toBe(3000);
+  });
+
+  it('terco de férias inclui vencidas mesmo em justa causa (Art. 146 CLT)', async () => {
+    const r = await calcularRescisao({ ...base, feriasVencidas: true });
+    // Proporcionais = 0 (Art. 147), mas vencidas são devidas; terço incide sobre as vencidas.
+    expect(r.feriasProporcionais).toBe(0);
+    expect(r.tercoFerias).toBeCloseTo(3000 / 3, 2);
   });
 });
 
