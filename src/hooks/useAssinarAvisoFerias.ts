@@ -20,9 +20,9 @@ export function useAssinarAvisoFerias() {
 
   const mutation = useMutation({
     mutationFn: async (payload: {
-      ferias: { id: string } & Record<string, unknown>;
-      colaborador: Record<string, unknown>;
-      empresa: { id?: string } & Record<string, unknown>;
+      ferias: { id: string };
+      colaborador: object;
+      empresa: { id?: string };
     }) => {
       const empresaId = empresaAtual?.id || payload.empresa?.id;
       if (!empresaId) throw new Error('Empresa não selecionada');
