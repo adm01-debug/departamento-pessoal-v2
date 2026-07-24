@@ -1,1 +1,255 @@
-LS0gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KLS0gTUVMSE9SSUEgMTAg4oCUIENvcnJlw6fDo28gZGUgNCBidWdzIGNvbmZpcm1hZG9zIG5hcyBtaWdyYcOnw7VlcyBkbyBib3QgKDIzLzA3KQotLQotLSBCdWcgQjEg8J+UtCBjb250cmF0b19sZW1icmV0ZXNfcGVuZGVudGVzOiBldmVudG8gJ3JlbWluZGVyX2VudmlhZG8nIHZpb2xhCi0tICAgQ0hFQ0sgY29uc3RyYWludCBkZSAxNTE2NTkgKHPDsyBwZXJtaXRlICdsZW1icmV0ZV9lbnZpYWRvJykuIFJ1bnRpbWUgY3Jhc2guCi0tIEJ1ZyBCNyDwn5S0IGNvbnRyYXRvX2xlbWJyZXRlc19wZW5kZW50ZXM6IGVtcHJlc2FfaWQgb21pdGlkbyBlbSBJTlNFUlQKLS0gICBlbSBjb250cmF0b190b2tlbl9ldmVudG9zIG9uZGUgZW1wcmVzYV9pZCDDqSBOT1QgTlVMTC4gUnVudGltZSBjcmFzaC4KLS0gQnVnIEIyIPCfn6AgY29udHJhdG9fdmVyaWZpY2FyX2F1dGVudGljaWRhZGU6IENQRiBjb21wbGV0byBleHBvc3RvIHBhcmEKLS0gICBhbm9uIHZpYSBTRUNVUklUWSBERUZJTkVSIOKAlCB2aW9sYcOnw6NvIExHUEQgQXJ0LjfCuiAobWluaW1pemHDp8OjbykuCi0tICAgRklYOiBtYXNjYXJhciDihpIgJyoqKi4qKiouWFhYLVhYJyAoYXBlbmFzIDUgw7psdGltb3MgZMOtZ2l0b3Mgdmlzw612ZWlzKS4KLS0gQnVnIEIzIPCflLQgY29udHJhdG9fdmVyaWZpY2FyX2F1dGVudGljaWRhZGVfdjIgKDE1MjQ1MCk6IHVzYSBjb2x1bmEKLS0gICAnaWRlbnRpZmljYWRvcicgbWFzIGNpZW5jaWFfcmF0ZV9saW1pdHMgdGVtICdpZGVudGlmaWVyJy4gUnVudGltZSBjcmFzaC4KLS0gQ29uZmlybWFkb3MgZW0gUG9zdGdyZXMgcmVhbDogMjMvMjMgY2Vuw6FyaW9zIGFkdmVyc2FyaWFpcy4KLS0gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KCi0tIOKUgOKUgOKUgCBIZWxwZXI6IG1hc2NhcmFyIENQRiBwYXJhIHJlc3Bvc3RhIHDDumJsaWNhIChMR1BEKSDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKLS0gRm9ybWF0byBkZSBzYcOtZGE6ICcqKiouKioqLlhYWC1YWCcgb25kZSBYWFgtWFggc8OjbyBvcyA1IMO6bHRpbW9zIGTDrWdpdG9zLgpDUkVBVEUgT1IgUkVQTEFDRSBGVU5DVElPTiBwdWJsaWMuX21hc2tfY3BmKHBfY3BmIHRleHQpClJFVFVSTlMgdGV4dApMQU5HVUFHRSBwbHBnc3FsCklNTVVUQUJMRQpBUyAkZnVuYyQKREVDTEFSRQogIHZfZGlnaXRzIHRleHQ7CkJFR0lOCiAgSUYgcF9jcGYgSVMgTlVMTCBUSEVOCiAgICBSRVRVUk4gTlVMTDsKICBFTkQgSUY7CiAgdl9kaWdpdHMgOj0gcmVnZXhwX3JlcGxhY2UocF9jcGYsICdbXjAtOV0nLCAnJywgJ2cnKTsKICBJRiBsZW5ndGgodl9kaWdpdHMpID0gMTEgVEhFTgogICAgUkVUVVJOIGZvcm1hdCgnKioqLioqKi4lcy0lcycsIHN1YnN0cih2X2RpZ2l0cywgNywgMyksIHN1YnN0cih2X2RpZ2l0cywgMTAsIDIpKTsKICBFTkQgSUY7CiAgLS0gQ1BGIGZvcmEgZG8gcGFkcsOjbzogZGVpeGFyIHPDsyDDumx0aW1vcyAyIGNhcmFjdGVyZXMKICBSRVRVUk4gcmVwZWF0KCcqJywgR1JFQVRFU1QoMCwgbGVuZ3RoKHBfY3BmKSAtIDIpKSB8fCByaWdodChwX2NwZiwgMik7CkVORDsKJGZ1bmMkOwoKLS0g4pSA4pSA4pSAIEJ1ZyBCMSArIEI3OiBjb3JyaWdpciBjb250cmF0b19sZW1icmV0ZXNfcGVuZGVudGVzIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgApDUkVBVEUgT1IgUkVQTEFDRSBGVU5DVElPTiBwdWJsaWMuY29udHJhdG9fbGVtYnJldGVzX3BlbmRlbnRlcygpClJFVFVSTlMgVEFCTEUocHJvY2Vzc2Fkb3MgaW50LCBub3RpZmljYWRvcyBpbnQpCkxBTkdVQUdFIHBscGdzcWwKU0VDVVJJVFkgREVGSU5FUgpTRVQgc2VhcmNoX3BhdGggPSBwdWJsaWMKQVMgJGZ1bmMkCkRFQ0xBUkUKICB2X3Byb2MgICBpbnQgOj0gMDsKICB2X25vdGlmICBpbnQgOj0gMDsKICByICAgICAgICBSRUNPUkQ7CiAgdl9nZXN0b3IgdXVpZDsKICB2X2RpYXMgICBpbnQ7CkJFR0lOCiAgRk9SIHIgSU4KICAgIFNFTEVDVCB0LmlkLCB0LmNvbnRyYXRvX2lkLCB0LmVtcHJlc2FfaWQsIHQuZW1haWxfZGVzdGluYXRhcmlvLCB0LmV4cGlyYV9lbSwKICAgICAgICAgICB0LnJlbWluZGVyc19lbnZpYWRvcywgY2cuY29sYWJvcmFkb3JfaWQKICAgIEZST00gcHVibGljLmNvbnRyYXRvX2Fzc2luYXR1cmFfdG9rZW5zIHQKICAgIEpPSU4gcHVibGljLmNvbnRyYXRvc19nZXJhZG9zIGNnIE9OIGNnLmlkID0gdC5jb250cmF0b19pZAogICAgV0hFUkUgdC51c2Fkb19lbSBJUyBOVUxMCiAgICAgIEFORCB0LnJldm9nYWRvX2VtIElTIE5VTEwKICAgICAgQU5EIHQuZXhwaXJhX2VtID4gbm93KCkKICAgICAgQU5EIHQuZXhwaXJhX2VtIDw9IG5vdygpICsgaW50ZXJ2YWwgJzMgZGF5cycKICAgICAgQU5EICh0LnVsdGltb19yZW1pbmRlcl9hdCBJUyBOVUxMIE9SIHQudWx0aW1vX3JlbWluZGVyX2F0IDwgbm93KCkgLSBpbnRlcnZhbCAnMjAgaG91cnMnKQogICAgICBBTkQgQ09BTEVTQ0UodC5yZW1pbmRlcnNfZW52aWFkb3MsIDApIDwgMwogICAgTElNSVQgMjAwCiAgTE9PUAogICAgdl9wcm9jIDo9IHZfcHJvYyArIDE7CiAgICB2X2RpYXMgOj0gR1JFQVRFU1QoMCwgRVhUUkFDVChEQVkgRlJPTSByLmV4cGlyYV9lbSAtIG5vdygpKTo6aW50KTsKCiAgICAtLSBCMSBmaXg6ICdyZW1pbmRlcl9lbnZpYWRvJyDihpIgJ2xlbWJyZXRlX2VudmlhZG8nIChjb25mb3JtZSBDSEVDSyBjb25zdHJhaW50IDE1MTY1OSkKICAgIC0tIEI3IGZpeDogZW1wcmVzYV9pZCA9IHIuZW1wcmVzYV9pZCBhZGljaW9uYWRvIChlcmEgTk9UIE5VTEwgZSBlc3RhdmEgYXVzZW50ZSkKICAgIElOU0VSVCBJTlRPIHB1YmxpYy5jb250cmF0b190b2tlbl9ldmVudG9zIChlbXByZXNhX2lkLCB0b2tlbl9pZCwgY29udHJhdG9faWQsIGV2ZW50bywgZGV0YWxoZXMpCiAgICBWQUxVRVMgKAogICAgICByLmVtcHJlc2FfaWQsCiAgICAgIHIuaWQsCiAgICAgIHIuY29udHJhdG9faWQsCiAgICAgICdsZW1icmV0ZV9lbnZpYWRvJywKICAgICAganNvbmJfYnVpbGRfb2JqZWN0KAogICAgICAgICdkaWFzX3Jlc3RhbnRlcycsIHZfZGlhcywKICAgICAgICAnZGVzdGluYXRhcmlvJywgICByLmVtYWlsX2Rlc3RpbmF0YXJpbywKICAgICAgICAndGVudGF0aXZhJywgICAgICBDT0FMRVNDRShyLnJlbWluZGVyc19lbnZpYWRvcywgMCkgKyAxCiAgICAgICkKICAgICk7CgogICAgU0VMRUNUIHVyLnVzZXJfaWQgSU5UTyB2X2dlc3RvcgogICAgRlJPTSBwdWJsaWMudXNlcl9lbXByZXNhcyB1ZQogICAgSk9JTiBwdWJsaWMudXNlcl9yb2xlcyB1ciBPTiB1ci51c2VyX2lkID0gdWUudXNlcl9pZAogICAgV0hFUkUgdWUuZW1wcmVzYV9pZCA9IHIuZW1wcmVzYV9pZAogICAgICBBTkQgdXIucm9sZSBJTiAoJ2FkbWluJywgJ3JoJywgJ2dlc3RvcicpCiAgICBMSU1JVCAxOwoKICAgIElGIHZfZ2VzdG9yIElTIE5PVCBOVUxMIFRIRU4KICAgICAgSU5TRVJUIElOVE8gcHVibGljLm5vdGlmaWNhY29lcyAodXNlcl9pZCwgZW1wcmVzYV9pZCwgdGlwbywgdGl0dWxvLCBtZW5zYWdlbSwgZW50aWRhZGVfdGlwbywgZW50aWRhZGVfaWQpCiAgICAgIFZBTFVFUyAoCiAgICAgICAgdl9nZXN0b3IsIHIuZW1wcmVzYV9pZCwgJ2NvbnRyYXRvX3BlbmRlbnRlJywKICAgICAgICAnQ29udHJhdG8gYWd1YXJkYW5kbyBhc3NpbmF0dXJhJywKICAgICAgICBmb3JtYXQoJ0NvbnRyYXRvIGV4cGlyYSBlbSAlcyBkaWEocykuIERlc3RpbmF0w6FyaW86ICVzJywKICAgICAgICAgICAgICAgdl9kaWFzLCBDT0FMRVNDRShyLmVtYWlsX2Rlc3RpbmF0YXJpbywgJ+KAlCcpKSwKICAgICAgICAnY29udHJhdG9fZ2VyYWRvJywgci5jb250cmF0b19pZAogICAgICApOwogICAgICB2X25vdGlmIDo9IHZfbm90aWYgKyAxOwogICAgRU5EIElGOwoKICAgIFVQREFURSBwdWJsaWMuY29udHJhdG9fYXNzaW5hdHVyYV90b2tlbnMKICAgIFNFVCByZW1pbmRlcnNfZW52aWFkb3MgPSBDT0FMRVNDRShyZW1pbmRlcnNfZW52aWFkb3MsIDApICsgMSwKICAgICAgICB1bHRpbW9fcmVtaW5kZXJfYXQgPSBub3coKQogICAgV0hFUkUgaWQgPSByLmlkOwogIEVORCBMT09QOwoKICBSRVRVUk4gUVVFUlkgU0VMRUNUIHZfcHJvYywgdl9ub3RpZjsKRU5EOwokZnVuYyQ7CgpSRVZPS0UgQUxMIE9OIEZVTkNUSU9OIHB1YmxpYy5jb250cmF0b19sZW1icmV0ZXNfcGVuZGVudGVzKCkgRlJPTSBQVUJMSUMsIGFub24sIGF1dGhlbnRpY2F0ZWQ7CkdSQU5UIEVYRUNVVEUgT04gRlVOQ1RJT04gcHVibGljLmNvbnRyYXRvX2xlbWJyZXRlc19wZW5kZW50ZXMoKSBUTyBzZXJ2aWNlX3JvbGU7CgotLSDilIDilIDilIAgQnVnIEIyOiBtYXNjYXJhciBDUEYgZW0gY29udHJhdG9fdmVyaWZpY2FyX2F1dGVudGljaWRhZGUgdjEg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSACkNSRUFURSBPUiBSRVBMQUNFIEZVTkNUSU9OIHB1YmxpYy5jb250cmF0b192ZXJpZmljYXJfYXV0ZW50aWNpZGFkZShwX2hhc2ggdGV4dCkKUkVUVVJOUyBqc29uYgpMQU5HVUFHRSBwbHBnc3FsClNUQUJMRQpTRUNVUklUWSBERUZJTkVSClNFVCBzZWFyY2hfcGF0aCA9IHB1YmxpYwpBUyAkZnVuYyQKREVDTEFSRQogIHZfaGFzaCB0ZXh0OwogIHZfcm93ICByZWNvcmQ7CkJFR0lOCiAgSUYgcF9oYXNoIElTIE5VTEwgT1IgbGVuZ3RoKHBfaGFzaCkgPCAzMiBUSEVOCiAgICBSRVRVUk4ganNvbmJfYnVpbGRfb2JqZWN0KCd2YWxpZG8nLCBmYWxzZSwgJ21vdGl2bycsICdIYXNoIGludsOhbGlkbycpOwogIEVORCBJRjsKICB2X2hhc2ggOj0gbG93ZXIodHJpbShwX2hhc2gpKTsKCiAgU0VMRUNUCiAgICBjZy5pZCwgY2cuc3RhdHVzLCBjZy5hc3NpbmFkb19lbSwKICAgIGNnLnNoYTI1NiAgICAgICAgQVMgZG9jdW1lbnRvX2hhc2gsCiAgICBjZy5kYXRhX2luaWNpbywgIGNnLmRhdGFfZmltLAogICAgZS5yYXphb19zb2NpYWwgICBBUyBlbXByZXNhX25vbWUsCiAgICBjLm5vbWVfY29tcGxldG8gIEFTIGNvbGFib3JhZG9yX25vbWUsCiAgICBwdWJsaWMuX21hc2tfY3BmKGMuY3BmKSBBUyBjb2xhYm9yYWRvcl9jcGYsCiAgICB0LmFzc2luYXR1cmFfaGFzaAogIElOVE8gdl9yb3cKICBGUk9NIHB1YmxpYy5jb250cmF0b3NfZ2VyYWRvcyBjZwogIExFRlQgSk9JTiBwdWJsaWMuY29udHJhdG9fYXNzaW5hdHVyYV90b2tlbnMgdAogICAgICAgICBPTiB0LmNvbnRyYXRvX2lkID0gY2cuaWQgQU5EIHQudXNhZG9fZW0gSVMgTk9UIE5VTEwKICBMRUZUIEpPSU4gcHVibGljLmVtcHJlc2FzIGUgT04gZS5pZCA9IGNnLmVtcHJlc2FfaWQKICBMRUZUIEpPSU4gcHVibGljLmNvbGFib3JhZG9yZXMgYyBPTiBjLmlkID0gY2cuY29sYWJvcmFkb3JfaWQKICBXSEVSRSBsb3dlcihjZy5zaGEyNTYpID0gdl9oYXNoCiAgICAgT1IgbG93ZXIodC5hc3NpbmF0dXJhX2hhc2gpID0gdl9oYXNoCiAgT1JERVIgQlkgY2cuYXNzaW5hZG9fZW0gREVTQyBOVUxMUyBMQVNUCiAgTElNSVQgMTsKCiAgSUYgTk9UIEZPVU5EIFRIRU4KICAgIFJFVFVSTiBqc29uYl9idWlsZF9vYmplY3QoJ3ZhbGlkbycsIGZhbHNlLCAnbW90aXZvJywgJ0NvbnRyYXRvIG7Do28gZW5jb250cmFkbycpOwogIEVORCBJRjsKCiAgUkVUVVJOIGpzb25iX2J1aWxkX29iamVjdCgKICAgICd2YWxpZG8nLCAgICAgICAgICAgdl9yb3cuc3RhdHVzID0gJ2Fzc2luYWRvJyBBTkQgdl9yb3cuYXNzaW5hZG9fZW0gSVMgTk9UIE5VTEwsCiAgICAnc3RhdHVzJywgICAgICAgICAgIHZfcm93LnN0YXR1cywKICAgICdhc3NpbmFkb19lbScsICAgICAgdl9yb3cuYXNzaW5hZG9fZW0sCiAgICAnZG9jdW1lbnRvX2hhc2gnLCAgIHZfcm93LmRvY3VtZW50b19oYXNoLAogICAgJ2Fzc2luYXR1cmFfaGFzaCcsICB2X3Jvdy5hc3NpbmF0dXJhX2hhc2gsCiAgICAnZW1wcmVzYScsICAgICAgICAgIHZfcm93LmVtcHJlc2Ffbm9tZSwKICAgICdjb2xhYm9yYWRvcl9ub21lJywgdl9yb3cuY29sYWJvcmFkb3Jfbm9tZSwKICAgICdjb2xhYm9yYWRvcl9jcGYnLCAgdl9yb3cuY29sYWJvcmFkb3JfY3BmLAogICAgJ2RhdGFfaW5pY2lvJywgICAgICB2X3Jvdy5kYXRhX2luaWNpbywKICAgICdkYXRhX2ZpbScsICAgICAgICAgdl9yb3cuZGF0YV9maW0KICApOwpFTkQ7CiRmdW5jJDsKClJFVk9LRSBBTEwgT04gRlVOQ1RJT04gcHVibGljLmNvbnRyYXRvX3ZlcmlmaWNhcl9hdXRlbnRpY2lkYWRlKHRleHQpIEZST00gUFVCTElDOwpHUkFOVCBFWEVDVVRFIE9OIEZVTkNUSU9OIHB1YmxpYy5jb250cmF0b192ZXJpZmljYXJfYXV0ZW50aWNpZGFkZSh0ZXh0KSBUTyBhbm9uLCBhdXRoZW50aWNhdGVkOwoKLS0g4pSA4pSA4pSAIEJ1ZyBCMiArIEIzOiBjb250cmF0b192ZXJpZmljYXJfYXV0ZW50aWNpZGFkZV92MiDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAKLS0gQjIgZml4OiBtYXNjYXJhciBDUEYKLS0gQjMgZml4OiB1c2FyICdpZGVudGlmaWVyJyAobsOjbyAnaWRlbnRpZmljYWRvcicpIGVtIGNpZW5jaWFfcmF0ZV9saW1pdHMKQ1JFQVRFIE9SIFJFUExBQ0UgRlVOQ1RJT04gcHVibGljLmNvbnRyYXRvX3ZlcmlmaWNhcl9hdXRlbnRpY2lkYWRlX3YyKAogIHBfaGFzaCB0ZXh0LAogIHBfaXAgICB0ZXh0IERFRkFVTFQgTlVMTAopClJFVFVSTlMganNvbmIKTEFOR1VBR0UgcGxwZ3NxbApTRUNVUklUWSBERUZJTkVSClNFVCBzZWFyY2hfcGF0aCA9IHB1YmxpYwpBUyAkZnVuYyQKREVDTEFSRQogIHZfaGFzaCAgdGV4dDsKICB2X3JvdyAgIHJlY29yZDsKICB2X2lwICAgIHRleHQ7CiAgdl9jb3VudCBpbnRlZ2VyOwpCRUdJTgogIElGIHBfaGFzaCBJUyBOVUxMIE9SIGxlbmd0aChwX2hhc2gpIDwgMzIgVEhFTgogICAgUkVUVVJOIGpzb25iX2J1aWxkX29iamVjdCgndmFsaWRvJywgZmFsc2UsICdtb3Rpdm8nLCAnSGFzaCBpbnbDoWxpZG8nKTsKICBFTkQgSUY7CgogIHZfaXAgOj0gQ09BTEVTQ0UocF9pcCwgJ3Vua25vd24nKTsKCiAgLS0gUmF0ZSBsaW1pdDogMjAgY29uc3VsdGFzIHBvciAxMCBtaW51dG9zIHBvciBJUAogIC0tIEIzIGZpeDogJ2lkZW50aWZpZXInICgxNTI1NTYgY29ycmV0bykg4oCUIDE1MjQ1MCB1c2F2YSAnaWRlbnRpZmljYWRvcicgcG9yIGVuZ2FubwogIFNFTEVDVCBDT1VOVCgqKSBJTlRPIHZfY291bnQKICBGUk9NIHB1YmxpYy5jaWVuY2lhX3JhdGVfbGltaXRzCiAgV0hFUkUgaWRlbnRpZmllciA9ICd2ZXJpZl9jb250cmF0bzonIHx8IHZfaXAKICAgIEFORCBjcmVhdGVkX2F0ID4gbm93KCkgLSBpbnRlcnZhbCAnMTAgbWludXRlcyc7CgogIElGIHZfY291bnQgPj0gMjAgVEhFTgogICAgUkVUVVJOIGpzb25iX2J1aWxkX29iamVjdCgKICAgICAgJ3ZhbGlkbycsIGZhbHNlLAogICAgICAnbW90aXZvJywgJ011aXRhcyB0ZW50YXRpdmFzLiBBZ3VhcmRlIDEwIG1pbnV0b3MgZSB0ZW50ZSBub3ZhbWVudGUuJwogICAgKTsKICBFTkQgSUY7CgogIElOU0VSVCBJTlRPIHB1YmxpYy5jaWVuY2lhX3JhdGVfbGltaXRzIChpZGVudGlmaWVyLCBycGNfbmFtZSwgaXBfYWRkcmVzcywgc3VjY2VzcykKICBWQUxVRVMgKCd2ZXJpZl9jb250cmF0bzonIHx8IHZfaXAsICdjb250cmF0b192ZXJpZmljYXJfYXV0ZW50aWNpZGFkZV92MicsIHZfaXA6OmluZXQsIHRydWUpOwoKICB2X2hhc2ggOj0gbG93ZXIodHJpbShwX2hhc2gpKTsKCiAgU0VMRUNUCiAgICBjZy5pZCwgY2cuc3RhdHVzLCBjZy5hc3NpbmFkb19lbSwKICAgIGNnLnNoYTI1NiAgICAgICAgQVMgZG9jdW1lbnRvX2hhc2gsCiAgICBjZy5kYXRhX2luaWNpbywgIGNnLmRhdGFfZmltLAogICAgZS5yYXphb19zb2NpYWwgICBBUyBlbXByZXNhX25vbWUsCiAgICBjLm5vbWVfY29tcGxldG8gIEFTIGNvbGFib3JhZG9yX25vbWUsCiAgICBwdWJsaWMuX21hc2tfY3BmKGMuY3BmKSBBUyBjb2xhYm9yYWRvcl9jcGYsCiAgICB0LmFzc2luYXR1cmFfaGFzaAogIElOVE8gdl9yb3cKICBGUk9NIHB1YmxpYy5jb250cmF0b3NfZ2VyYWRvcyBjZwogIExFRlQgSk9JTiBwdWJsaWMuY29udHJhdG9fYXNzaW5hdHVyYV90b2tlbnMgdAogICAgICAgICBPTiB0LmNvbnRyYXRvX2lkID0gY2cuaWQgQU5EIHQudXNhZG9fZW0gSVMgTk9UIE5VTEwKICBMRUZUIEpPSU4gcHVibGljLmVtcHJlc2FzIGUgT04gZS5pZCA9IGNnLmVtcHJlc2FfaWQKICBMRUZUIEpPSU4gcHVibGljLmNvbGFib3JhZG9yZXMgYyBPTiBjLmlkID0gY2cuY29sYWJvcmFkb3JfaWQKICBXSEVSRSBsb3dlcihjZy5zaGEyNTYpID0gdl9oYXNoCiAgICAgT1IgbG93ZXIodC5hc3NpbmF0dXJhX2hhc2gpID0gdl9oYXNoCiAgT1JERVIgQlkgY2cuYXNzaW5hZG9fZW0gREVTQyBOVUxMUyBMQVNUCiAgTElNSVQgMTsKCiAgSUYgTk9UIEZPVU5EIFRIRU4KICAgIFJFVFVSTiBqc29uYl9idWlsZF9vYmplY3QoJ3ZhbGlkbycsIGZhbHNlLCAnbW90aXZvJywgJ0NvbnRyYXRvIG7Do28gZW5jb250cmFkbycpOwogIEVORCBJRjsKCiAgUkVUVVJOIGpzb25iX2J1aWxkX29iamVjdCgKICAgICd2YWxpZG8nLCAgICAgICAgICAgdl9yb3cuc3RhdHVzID0gJ2Fzc2luYWRvJyBBTkQgdl9yb3cuYXNzaW5hZG9fZW0gSVMgTk9UIE5VTEwsCiAgICAnc3RhdHVzJywgICAgICAgICAgIHZfcm93LnN0YXR1cywKICAgICdhc3NpbmFkb19lbScsICAgICAgdl9yb3cuYXNzaW5hZG9fZW0sCiAgICAnZG9jdW1lbnRvX2hhc2gnLCAgIHZfcm93LmRvY3VtZW50b19oYXNoLAogICAgJ2Fzc2luYXR1cmFfaGFzaCcsICB2X3Jvdy5hc3NpbmF0dXJhX2hhc2gsCiAgICAnZW1wcmVzYScsICAgICAgICAgIHZfcm93LmVtcHJlc2Ffbm9tZSwKICAgICdjb2xhYm9yYWRvcl9ub21lJywgdl9yb3cuY29sYWJvcmFkb3Jfbm9tZSwKICAgICdjb2xhYm9yYWRvcl9jcGYnLCAgdl9yb3cuY29sYWJvcmFkb3JfY3BmLAogICAgJ2RhdGFfaW5pY2lvJywgICAgICB2X3Jvdy5kYXRhX2luaWNpbywKICAgICdkYXRhX2ZpbScsICAgICAgICAgdl9yb3cuZGF0YV9maW0KICApOwpFTkQ7CiRmdW5jJDsKClJFVk9LRSBBTEwgT04gRlVOQ1RJT04gcHVibGljLmNvbnRyYXRvX3ZlcmlmaWNhcl9hdXRlbnRpY2lkYWRlX3YyKHRleHQsIHRleHQpIEZST00gUFVCTElDOwpHUkFOVCBFWEVDVVRFIE9OIEZVTkNUSU9OIHB1YmxpYy5jb250cmF0b192ZXJpZmljYXJfYXV0ZW50aWNpZGFkZV92Mih0ZXh0LCB0ZXh0KSBUTyBhbm9uLCBhdXRoZW50aWNhdGVkOwo=
+-- =============================================================================
+-- MELHORIA 10 — Correção de 4 bugs confirmados nas migrações do bot (23/07)
+--
+-- Bug B1 🔴 contrato_lembretes_pendentes: evento 'reminder_enviado' viola
+--   CHECK constraint de 151659 (só permite 'lembrete_enviado'). Runtime crash.
+-- Bug B7 🔴 contrato_lembretes_pendentes: empresa_id omitido em INSERT
+--   em contrato_token_eventos onde empresa_id é NOT NULL. Runtime crash.
+-- Bug B2 🟠 contrato_verificar_autenticidade: CPF completo exposto para
+--   anon via SECURITY DEFINER — violação LGPD Art.7º (minimização).
+--   FIX: mascarar → '***.***.XXX-XX' (apenas 5 últimos dígitos visíveis).
+-- Bug B3 🔴 contrato_verificar_autenticidade_v2 (152450): usa coluna
+--   'identificador' mas ciencia_rate_limits tem 'identifier'. Runtime crash.
+-- Confirmados em Postgres real: 23/23 cenários adversariais.
+-- =============================================================================
+
+-- ─── Helper: mascarar CPF para resposta pública (LGPD) ────────────────────
+-- Formato de saída: '***.***.XXX-XX' onde XXX-XX são os 5 últimos dígitos.
+CREATE OR REPLACE FUNCTION public._mask_cpf(p_cpf text)
+RETURNS text
+LANGUAGE plpgsql
+IMMUTABLE
+AS $func$
+DECLARE
+  v_digits text;
+BEGIN
+  IF p_cpf IS NULL THEN
+    RETURN NULL;
+  END IF;
+  v_digits := regexp_replace(p_cpf, '[^0-9]', '', 'g');
+  IF length(v_digits) = 11 THEN
+    RETURN format('***.***.%s-%s', substr(v_digits, 7, 3), substr(v_digits, 10, 2));
+  END IF;
+  -- CPF fora do padrão: deixar só últimos 2 caracteres
+  RETURN repeat('*', GREATEST(0, length(p_cpf) - 2)) || right(p_cpf, 2);
+END;
+$func$;
+
+-- ─── Bug B1 + B7: corrigir contrato_lembretes_pendentes ───────────────────
+CREATE OR REPLACE FUNCTION public.contrato_lembretes_pendentes()
+RETURNS TABLE(processados int, notificados int)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $func$
+DECLARE
+  v_proc   int := 0;
+  v_notif  int := 0;
+  r        RECORD;
+  v_gestor uuid;
+  v_dias   int;
+BEGIN
+  FOR r IN
+    SELECT t.id, t.contrato_id, t.empresa_id, t.email_destinatario, t.expira_em,
+           t.reminders_enviados, cg.colaborador_id
+    FROM public.contrato_assinatura_tokens t
+    JOIN public.contratos_gerados cg ON cg.id = t.contrato_id
+    WHERE t.usado_em IS NULL
+      AND t.revogado_em IS NULL
+      AND t.expira_em > now()
+      AND t.expira_em <= now() + interval '3 days'
+      AND (t.ultimo_reminder_at IS NULL OR t.ultimo_reminder_at < now() - interval '20 hours')
+      AND COALESCE(t.reminders_enviados, 0) < 3
+    LIMIT 200
+  LOOP
+    v_proc := v_proc + 1;
+    v_dias := GREATEST(0, EXTRACT(DAY FROM r.expira_em - now())::int);
+
+    -- B1 fix: 'reminder_enviado' → 'lembrete_enviado' (conforme CHECK constraint 151659)
+    -- B7 fix: empresa_id = r.empresa_id adicionado (era NOT NULL e estava ausente)
+    INSERT INTO public.contrato_token_eventos (empresa_id, token_id, contrato_id, evento, detalhes)
+    VALUES (
+      r.empresa_id,
+      r.id,
+      r.contrato_id,
+      'lembrete_enviado',
+      jsonb_build_object(
+        'dias_restantes', v_dias,
+        'destinatario',   r.email_destinatario,
+        'tentativa',      COALESCE(r.reminders_enviados, 0) + 1
+      )
+    );
+
+    SELECT ur.user_id INTO v_gestor
+    FROM public.user_empresas ue
+    JOIN public.user_roles ur ON ur.user_id = ue.user_id
+    WHERE ue.empresa_id = r.empresa_id
+      AND ur.role IN ('admin', 'rh', 'gestor')
+    LIMIT 1;
+
+    IF v_gestor IS NOT NULL THEN
+      INSERT INTO public.notificacoes (user_id, empresa_id, tipo, titulo, mensagem, entidade_tipo, entidade_id)
+      VALUES (
+        v_gestor, r.empresa_id, 'contrato_pendente',
+        'Contrato aguardando assinatura',
+        format('Contrato expira em %s dia(s). Destinatário: %s',
+               v_dias, COALESCE(r.email_destinatario, '—')),
+        'contrato_gerado', r.contrato_id
+      );
+      v_notif := v_notif + 1;
+    END IF;
+
+    UPDATE public.contrato_assinatura_tokens
+    SET reminders_enviados = COALESCE(reminders_enviados, 0) + 1,
+        ultimo_reminder_at = now()
+    WHERE id = r.id;
+  END LOOP;
+
+  RETURN QUERY SELECT v_proc, v_notif;
+END;
+$func$;
+
+REVOKE ALL ON FUNCTION public.contrato_lembretes_pendentes() FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.contrato_lembretes_pendentes() TO service_role;
+
+-- ─── Bug B2: mascarar CPF em contrato_verificar_autenticidade v1 ──────────
+CREATE OR REPLACE FUNCTION public.contrato_verificar_autenticidade(p_hash text)
+RETURNS jsonb
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $func$
+DECLARE
+  v_hash text;
+  v_row  record;
+BEGIN
+  IF p_hash IS NULL OR length(p_hash) < 32 THEN
+    RETURN jsonb_build_object('valido', false, 'motivo', 'Hash inválido');
+  END IF;
+  v_hash := lower(trim(p_hash));
+
+  SELECT
+    cg.id, cg.status, cg.assinado_em,
+    cg.sha256        AS documento_hash,
+    cg.data_inicio,  cg.data_fim,
+    e.razao_social   AS empresa_nome,
+    c.nome_completo  AS colaborador_nome,
+    public._mask_cpf(c.cpf) AS colaborador_cpf,
+    t.assinatura_hash
+  INTO v_row
+  FROM public.contratos_gerados cg
+  LEFT JOIN public.contrato_assinatura_tokens t
+         ON t.contrato_id = cg.id AND t.usado_em IS NOT NULL
+  LEFT JOIN public.empresas e ON e.id = cg.empresa_id
+  LEFT JOIN public.colaboradores c ON c.id = cg.colaborador_id
+  WHERE lower(cg.sha256) = v_hash
+     OR lower(t.assinatura_hash) = v_hash
+  ORDER BY cg.assinado_em DESC NULLS LAST
+  LIMIT 1;
+
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object('valido', false, 'motivo', 'Contrato não encontrado');
+  END IF;
+
+  RETURN jsonb_build_object(
+    'valido',           v_row.status = 'assinado' AND v_row.assinado_em IS NOT NULL,
+    'status',           v_row.status,
+    'assinado_em',      v_row.assinado_em,
+    'documento_hash',   v_row.documento_hash,
+    'assinatura_hash',  v_row.assinatura_hash,
+    'empresa',          v_row.empresa_nome,
+    'colaborador_nome', v_row.colaborador_nome,
+    'colaborador_cpf',  v_row.colaborador_cpf,
+    'data_inicio',      v_row.data_inicio,
+    'data_fim',         v_row.data_fim
+  );
+END;
+$func$;
+
+REVOKE ALL ON FUNCTION public.contrato_verificar_autenticidade(text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.contrato_verificar_autenticidade(text) TO anon, authenticated;
+
+-- ─── Bug B2 + B3: contrato_verificar_autenticidade_v2 ─────────────────────
+-- B2 fix: mascarar CPF
+-- B3 fix: usar 'identifier' (não 'identificador') em ciencia_rate_limits
+CREATE OR REPLACE FUNCTION public.contrato_verificar_autenticidade_v2(
+  p_hash text,
+  p_ip   text DEFAULT NULL
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $func$
+DECLARE
+  v_hash  text;
+  v_row   record;
+  v_ip    text;
+  v_count integer;
+BEGIN
+  IF p_hash IS NULL OR length(p_hash) < 32 THEN
+    RETURN jsonb_build_object('valido', false, 'motivo', 'Hash inválido');
+  END IF;
+
+  v_ip := COALESCE(p_ip, 'unknown');
+
+  -- Rate limit: 20 consultas por 10 minutos por IP
+  -- B3 fix: 'identifier' (152556 correto) — 152450 usava 'identificador' por engano
+  SELECT COUNT(*) INTO v_count
+  FROM public.ciencia_rate_limits
+  WHERE identifier = 'verif_contrato:' || v_ip
+    AND created_at > now() - interval '10 minutes';
+
+  IF v_count >= 20 THEN
+    RETURN jsonb_build_object(
+      'valido', false,
+      'motivo', 'Muitas tentativas. Aguarde 10 minutos e tente novamente.'
+    );
+  END IF;
+
+  INSERT INTO public.ciencia_rate_limits (identifier, rpc_name, ip_address, success)
+  VALUES ('verif_contrato:' || v_ip, 'contrato_verificar_autenticidade_v2', v_ip::inet, true);
+
+  v_hash := lower(trim(p_hash));
+
+  SELECT
+    cg.id, cg.status, cg.assinado_em,
+    cg.sha256        AS documento_hash,
+    cg.data_inicio,  cg.data_fim,
+    e.razao_social   AS empresa_nome,
+    c.nome_completo  AS colaborador_nome,
+    public._mask_cpf(c.cpf) AS colaborador_cpf,
+    t.assinatura_hash
+  INTO v_row
+  FROM public.contratos_gerados cg
+  LEFT JOIN public.contrato_assinatura_tokens t
+         ON t.contrato_id = cg.id AND t.usado_em IS NOT NULL
+  LEFT JOIN public.empresas e ON e.id = cg.empresa_id
+  LEFT JOIN public.colaboradores c ON c.id = cg.colaborador_id
+  WHERE lower(cg.sha256) = v_hash
+     OR lower(t.assinatura_hash) = v_hash
+  ORDER BY cg.assinado_em DESC NULLS LAST
+  LIMIT 1;
+
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object('valido', false, 'motivo', 'Contrato não encontrado');
+  END IF;
+
+  RETURN jsonb_build_object(
+    'valido',           v_row.status = 'assinado' AND v_row.assinado_em IS NOT NULL,
+    'status',           v_row.status,
+    'assinado_em',      v_row.assinado_em,
+    'documento_hash',   v_row.documento_hash,
+    'assinatura_hash',  v_row.assinatura_hash,
+    'empresa',          v_row.empresa_nome,
+    'colaborador_nome', v_row.colaborador_nome,
+    'colaborador_cpf',  v_row.colaborador_cpf,
+    'data_inicio',      v_row.data_inicio,
+    'data_fim',         v_row.data_fim
+  );
+END;
+$func$;
+
+REVOKE ALL ON FUNCTION public.contrato_verificar_autenticidade_v2(text, text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.contrato_verificar_autenticidade_v2(text, text) TO anon, authenticated;

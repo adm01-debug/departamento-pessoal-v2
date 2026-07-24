@@ -1,1 +1,96 @@
-LS0gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KLS0gTUVMSE9SSUEgMTQg4oCUIEZpeCBidWcgZW0gY29udHJhdG9fdmVyaWZpY2FyX2F1dGVudGljaWRhZGVfdjI6IHZfaXA6OmluZXQKLS0KLS0gQnVnIGRldGVjdGFkbyBubyB0ZXN0ZSBleGF1c3Rpdm8gUjg6Ci0tICAgdl9pcCA9IENPQUxFU0NFKHBfaXAsICd1bmtub3duJykgKHRleHQpCi0tICAgSU5TRVJUIC4uLiBpcF9hZGRyZXNzID0gdl9pcDo6aW5ldCDihpIgZmFsaGEgcXVhbmRvIHBfaXA9TlVMTCBwb3JxdWUKLS0gICAndW5rbm93bic6OmluZXQgw6kgaW52w6FsaWRvIChJTkVUIG7Do28gYWNlaXRhIHRleHRvIGFyYml0csOhcmlvKS4KLS0KLS0gRklYOiB1c2FyIHBfaXAgZGlyZXRhbWVudGUgbm8gY2FtcG8gaXBfYWRkcmVzcyAow6kgZG8gdGlwbyBpbmV0LCBudWxsYWJsZSkuCi0tICAgTyBpZGVudGlmaWNhZG9yIGRvIHJhdGUgbGltaXQgY29udGludWEgdXNhbmRvIHZfaXAgKHRleHQpIHBhcmEgcXVlCi0tICAgJ3ZlcmlmX2NvbnRyYXRvOnVua25vd24nIGZ1bmNpb25lIGNvbW8gY2hhdmUgZGUgcmF0ZSBsaW1pdCBwb3IgSVAgYXVzZW50ZS4KLS0gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KCkNSRUFURSBPUiBSRVBMQUNFIEZVTkNUSU9OIHB1YmxpYy5jb250cmF0b192ZXJpZmljYXJfYXV0ZW50aWNpZGFkZV92MigKICBwX2hhc2ggdGV4dCwKICBwX2lwICAgdGV4dCBERUZBVUxUIE5VTEwKKQpSRVRVUk5TIGpzb25iCkxBTkdVQUdFIHBscGdzcWwKU0VDVVJJVFkgREVGSU5FUgpTRVQgc2VhcmNoX3BhdGggPSBwdWJsaWMKQVMgJGZ1bmMkCkRFQ0xBUkUKICB2X2hhc2ggIHRleHQ7CiAgdl9yb3cgICByZWNvcmQ7CiAgdl9pcCAgICB0ZXh0OwogIHZfY291bnQgaW50ZWdlcjsKQkVHSU4KICBJRiBwX2hhc2ggSVMgTlVMTCBPUiBsZW5ndGgocF9oYXNoKSA8IDMyIFRIRU4KICAgIFJFVFVSTiBqc29uYl9idWlsZF9vYmplY3QoJ3ZhbGlkbycsIGZhbHNlLCAnbW90aXZvJywgJ0hhc2ggaW52w6FsaWRvJyk7CiAgRU5EIElGOwoKICB2X2lwIDo9IENPQUxFU0NFKHBfaXAsICd1bmtub3duJyk7CgogIC0tIFJhdGUgbGltaXQ6IDIwIGNvbnN1bHRhcyBwb3IgMTAgbWludXRvcyBwb3IgSVAgb3UgJ3Vua25vd24nCiAgU0VMRUNUIENPVU5UKCopIElOVE8gdl9jb3VudAogIEZST00gcHVibGljLmNpZW5jaWFfcmF0ZV9saW1pdHMKICBXSEVSRSBpZGVudGlmaWVyID0gJ3ZlcmlmX2NvbnRyYXRvOicgfHwgdl9pcAogICAgQU5EIGNyZWF0ZWRfYXQgPiBub3coKSAtIGludGVydmFsICcxMCBtaW51dGVzJzsKCiAgSUYgdl9jb3VudCA+PSAyMCBUSEVOCiAgICBSRVRVUk4ganNvbmJfYnVpbGRfb2JqZWN0KAogICAgICAndmFsaWRvJywgZmFsc2UsCiAgICAgICdtb3Rpdm8nLCAnTXVpdGFzIHRlbnRhdGl2YXMuIEFndWFyZGUgMTAgbWludXRvcyBlIHRlbnRlIG5vdmFtZW50ZS4nCiAgICApOwogIEVORCBJRjsKCiAgLS0gQnVnIGZpeDogdXNhciBwX2lwIChpbmV0IG51bGxhYmxlKSBlbSB2ZXogZGUgdl9pcDo6aW5ldCAoJ3Vua25vd24nOjppbmV0IMOpIGludsOhbGlkbykKICBJTlNFUlQgSU5UTyBwdWJsaWMuY2llbmNpYV9yYXRlX2xpbWl0cyAoaWRlbnRpZmllciwgcnBjX25hbWUsIGlwX2FkZHJlc3MsIHN1Y2Nlc3MpCiAgVkFMVUVTICgndmVyaWZfY29udHJhdG86JyB8fCB2X2lwLAogICAgICAgICAgJ2NvbnRyYXRvX3ZlcmlmaWNhcl9hdXRlbnRpY2lkYWRlX3YyJywKICAgICAgICAgIHBfaXA6OmluZXQsICAgICAgICAgLS0gcF9pcCDDqSB0ZXh0IG1hcyBOVUxMOjppbmV0ID0gTlVMTCAodsOhbGlkbyk7IHBfaXAgbsOjby1OVUxMIMOpIHNlbXByZSBpbmV0IHbDoWxpZG8gcG9pcyB2ZW0gZG8gYXBwCiAgICAgICAgICB0cnVlKTsKCiAgdl9oYXNoIDo9IGxvd2VyKHRyaW0ocF9oYXNoKSk7CgogIFNFTEVDVAogICAgY2cuaWQsIGNnLnN0YXR1cywgY2cuYXNzaW5hZG9fZW0sCiAgICBjZy5zaGEyNTYgICAgICAgIEFTIGRvY3VtZW50b19oYXNoLAogICAgY2cuZGF0YV9pbmljaW8sICBjZy5kYXRhX2ZpbSwKICAgIGUucmF6YW9fc29jaWFsICAgQVMgZW1wcmVzYV9ub21lLAogICAgYy5ub21lX2NvbXBsZXRvICBBUyBjb2xhYm9yYWRvcl9ub21lLAogICAgcHVibGljLl9tYXNrX2NwZihjLmNwZikgQVMgY29sYWJvcmFkb3JfY3BmLAogICAgdC5hc3NpbmF0dXJhX2hhc2gKICBJTlRPIHZfcm93CiAgRlJPTSBwdWJsaWMuY29udHJhdG9zX2dlcmFkb3MgY2cKICBMRUZUIEpPSU4gcHVibGljLmNvbnRyYXRvX2Fzc2luYXR1cmFfdG9rZW5zIHQKICAgICAgICAgT04gdC5jb250cmF0b19pZCA9IGNnLmlkIEFORCB0LnVzYWRvX2VtIElTIE5PVCBOVUxMCiAgTEVGVCBKT0lOIHB1YmxpYy5lbXByZXNhcyBlIE9OIGUuaWQgPSBjZy5lbXByZXNhX2lkCiAgTEVGVCBKT0lOIHB1YmxpYy5jb2xhYm9yYWRvcmVzIGMgT04gYy5pZCA9IGNnLmNvbGFib3JhZG9yX2lkCiAgV0hFUkUgbG93ZXIoY2cuc2hhMjU2KSA9IHZfaGFzaAogICAgIE9SIGxvd2VyKHQuYXNzaW5hdHVyYV9oYXNoKSA9IHZfaGFzaAogIE9SREVSIEJZIGNnLmFzc2luYWRvX2VtIERFU0MgTlVMTFMgTEFTVAogIExJTUlUIDE7CgogIElGIE5PVCBGT1VORCBUSEVOCiAgICBSRVRVUk4ganNvbmJfYnVpbGRfb2JqZWN0KCd2YWxpZG8nLCBmYWxzZSwgJ21vdGl2bycsICdDb250cmF0byBuw6NvIGVuY29udHJhZG8nKTsKICBFTkQgSUY7CgogIFJFVFVSTiBqc29uYl9idWlsZF9vYmplY3QoCiAgICAndmFsaWRvJywgICAgICAgICAgIHZfcm93LnN0YXR1cyA9ICdhc3NpbmFkbycgQU5EIHZfcm93LmFzc2luYWRvX2VtIElTIE5PVCBOVUxMLAogICAgJ3N0YXR1cycsICAgICAgICAgICB2X3Jvdy5zdGF0dXMsCiAgICAnYXNzaW5hZG9fZW0nLCAgICAgIHZfcm93LmFzc2luYWRvX2VtLAogICAgJ2RvY3VtZW50b19oYXNoJywgICB2X3Jvdy5kb2N1bWVudG9faGFzaCwKICAgICdhc3NpbmF0dXJhX2hhc2gnLCAgdl9yb3cuYXNzaW5hdHVyYV9oYXNoLAogICAgJ2VtcHJlc2EnLCAgICAgICAgICB2X3Jvdy5lbXByZXNhX25vbWUsCiAgICAnY29sYWJvcmFkb3Jfbm9tZScsIHZfcm93LmNvbGFib3JhZG9yX25vbWUsCiAgICAnY29sYWJvcmFkb3JfY3BmJywgIHZfcm93LmNvbGFib3JhZG9yX2NwZiwKICAgICdkYXRhX2luaWNpbycsICAgICAgdl9yb3cuZGF0YV9pbmljaW8sCiAgICAnZGF0YV9maW0nLCAgICAgICAgIHZfcm93LmRhdGFfZmltCiAgKTsKRU5EOwokZnVuYyQ7CgpSRVZPS0UgQUxMIE9OIEZVTkNUSU9OIHB1YmxpYy5jb250cmF0b192ZXJpZmljYXJfYXV0ZW50aWNpZGFkZV92Mih0ZXh0LCB0ZXh0KSBGUk9NIFBVQkxJQzsKR1JBTlQgRVhFQ1VURSBPTiBGVU5DVElPTiBwdWJsaWMuY29udHJhdG9fdmVyaWZpY2FyX2F1dGVudGljaWRhZGVfdjIodGV4dCwgdGV4dCkgVE8gYW5vbiwgYXV0aGVudGljYXRlZDsK
+-- =============================================================================
+-- MELHORIA 14 — Fix bug em contrato_verificar_autenticidade_v2: v_ip::inet
+--
+-- Bug detectado no teste exaustivo R8:
+--   v_ip = COALESCE(p_ip, 'unknown') (text)
+--   INSERT ... ip_address = v_ip::inet → falha quando p_ip=NULL porque
+--   'unknown'::inet é inválido (INET não aceita texto arbitrário).
+--
+-- FIX: usar p_ip diretamente no campo ip_address (é do tipo inet, nullable).
+--   O identificador do rate limit continua usando v_ip (text) para que
+--   'verif_contrato:unknown' funcione como chave de rate limit por IP ausente.
+-- =============================================================================
+
+CREATE OR REPLACE FUNCTION public.contrato_verificar_autenticidade_v2(
+  p_hash text,
+  p_ip   text DEFAULT NULL
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $func$
+DECLARE
+  v_hash  text;
+  v_row   record;
+  v_ip    text;
+  v_count integer;
+BEGIN
+  IF p_hash IS NULL OR length(p_hash) < 32 THEN
+    RETURN jsonb_build_object('valido', false, 'motivo', 'Hash inválido');
+  END IF;
+
+  v_ip := COALESCE(p_ip, 'unknown');
+
+  -- Rate limit: 20 consultas por 10 minutos por IP ou 'unknown'
+  SELECT COUNT(*) INTO v_count
+  FROM public.ciencia_rate_limits
+  WHERE identifier = 'verif_contrato:' || v_ip
+    AND created_at > now() - interval '10 minutes';
+
+  IF v_count >= 20 THEN
+    RETURN jsonb_build_object(
+      'valido', false,
+      'motivo', 'Muitas tentativas. Aguarde 10 minutos e tente novamente.'
+    );
+  END IF;
+
+  -- Bug fix: usar p_ip (inet nullable) em vez de v_ip::inet ('unknown'::inet é inválido)
+  INSERT INTO public.ciencia_rate_limits (identifier, rpc_name, ip_address, success)
+  VALUES ('verif_contrato:' || v_ip,
+          'contrato_verificar_autenticidade_v2',
+          p_ip::inet,         -- p_ip é text mas NULL::inet = NULL (válido); p_ip não-NULL é sempre inet válido pois vem do app
+          true);
+
+  v_hash := lower(trim(p_hash));
+
+  SELECT
+    cg.id, cg.status, cg.assinado_em,
+    cg.sha256        AS documento_hash,
+    cg.data_inicio,  cg.data_fim,
+    e.razao_social   AS empresa_nome,
+    c.nome_completo  AS colaborador_nome,
+    public._mask_cpf(c.cpf) AS colaborador_cpf,
+    t.assinatura_hash
+  INTO v_row
+  FROM public.contratos_gerados cg
+  LEFT JOIN public.contrato_assinatura_tokens t
+         ON t.contrato_id = cg.id AND t.usado_em IS NOT NULL
+  LEFT JOIN public.empresas e ON e.id = cg.empresa_id
+  LEFT JOIN public.colaboradores c ON c.id = cg.colaborador_id
+  WHERE lower(cg.sha256) = v_hash
+     OR lower(t.assinatura_hash) = v_hash
+  ORDER BY cg.assinado_em DESC NULLS LAST
+  LIMIT 1;
+
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object('valido', false, 'motivo', 'Contrato não encontrado');
+  END IF;
+
+  RETURN jsonb_build_object(
+    'valido',           v_row.status = 'assinado' AND v_row.assinado_em IS NOT NULL,
+    'status',           v_row.status,
+    'assinado_em',      v_row.assinado_em,
+    'documento_hash',   v_row.documento_hash,
+    'assinatura_hash',  v_row.assinatura_hash,
+    'empresa',          v_row.empresa_nome,
+    'colaborador_nome', v_row.colaborador_nome,
+    'colaborador_cpf',  v_row.colaborador_cpf,
+    'data_inicio',      v_row.data_inicio,
+    'data_fim',         v_row.data_fim
+  );
+END;
+$func$;
+
+REVOKE ALL ON FUNCTION public.contrato_verificar_autenticidade_v2(text, text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.contrato_verificar_autenticidade_v2(text, text) TO anon, authenticated;
