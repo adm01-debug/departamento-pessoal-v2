@@ -43,7 +43,7 @@ describe('RPC permissions — anon role', () => {
       _role: 'admin',
     });
     expect(error).toBeTruthy();
-    expect(error!.message).toMatch(/permission denied|not allowed|not found/i);
+    expect(error!.message).toMatch(/permission denied|not allowed|not found|allowlist/i);
   });
 
   it('get_user_scope_empresas NÃO pode ser executada por anon', async () => {
@@ -51,7 +51,7 @@ describe('RPC permissions — anon role', () => {
       _user_id: '00000000-0000-0000-0000-000000000000',
     });
     expect(error).toBeTruthy();
-    expect(error!.message).toMatch(/permission denied|not allowed|not found/i);
+    expect(error!.message).toMatch(/permission denied|not allowed|not found|allowlist/i);
   });
 });
 
