@@ -13,10 +13,10 @@ BEGIN
       AND column_name = 'empresa_id'
       AND is_nullable = 'YES'
   ) THEN
-    -- Nullify orphan rows before constraining (safety: SET NULL on rows
-    -- whose empresa_id is already NULL — the ALTER would fail otherwise).
-    -- Any row without empresa_id at this point is corrupt; NULL-out empresa_id
-    -- is already true for them so the DO-block is a no-op on clean databases.
+    -- Remover rows sem empresa_id (são inválidas — não pertencem a nenhuma empresa).
+    -- Em produção com rows legadas órfãs, o DELETE as remove antes do constraint.
+    -- Em bancos frescos (preview) esta query é no-op (sem rows).
+    DELETE FROM public.desligamentos WHERE empresa_id IS NULL;
     ALTER TABLE public.desligamentos ALTER COLUMN empresa_id SET NOT NULL;
   END IF;
 END $$;
