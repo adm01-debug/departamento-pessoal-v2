@@ -33,8 +33,8 @@ describe('bancoHorasService', () => {
 
     it('returns data from supabase', async () => {
       const records = [
-        { id: '1', tipo: 'credito', quantidade_horas: '8' },
-        { id: '2', tipo: 'debito', quantidade_horas: '3' },
+        { id: '1', tipo: 'credito', horas: '08:00:00' },
+        { id: '2', tipo: 'debito', horas: '03:00:00' },
       ];
       setupList(records);
       const result = await bancoHorasService.listarPorColaborador('colab-1');
@@ -59,7 +59,14 @@ describe('bancoHorasService', () => {
       const eq = vi.fn().mockResolvedValue({ data, error });
       const select = vi.fn().mockReturnValue({ eq });
       mockFrom.mockReturnValue({ select });
+      return { select, eq };
     }
+
+    it('selects tipo and horas columns (not quantidade_horas)', async () => {
+      const { select } = setupSaldo([]);
+      await bancoHorasService.getSaldo('colab-1');
+      expect(select).toHaveBeenCalledWith('tipo, horas');
+    });
 
     it('returns 0 when no records exist (null)', async () => {
       setupSaldo(null);
@@ -75,8 +82,8 @@ describe('bancoHorasService', () => {
 
     it('accumulates credito as positive', async () => {
       setupSaldo([
-        { tipo: 'credito', quantidade_horas: '8' },
-        { tipo: 'credito', quantidade_horas: '2' },
+        { tipo: 'credito', horas: '08:00:00' },
+        { tipo: 'credito', horas: '02:00:00' },
       ]);
       const saldo = await bancoHorasService.getSaldo('colab-1');
       expect(saldo).toBe(10);
@@ -84,8 +91,8 @@ describe('bancoHorasService', () => {
 
     it('accumulates debito as negative', async () => {
       setupSaldo([
-        { tipo: 'debito', quantidade_horas: '5' },
-        { tipo: 'debito', quantidade_horas: '3' },
+        { tipo: 'debito', horas: '05:00:00' },
+        { tipo: 'debito', horas: '03:00:00' },
       ]);
       const saldo = await bancoHorasService.getSaldo('colab-1');
       expect(saldo).toBe(-8);
@@ -93,9 +100,9 @@ describe('bancoHorasService', () => {
 
     it('balances credits against debits correctly', async () => {
       setupSaldo([
-        { tipo: 'credito', quantidade_horas: '10' },
-        { tipo: 'debito', quantidade_horas: '4' },
-        { tipo: 'credito', quantidade_horas: '2' },
+        { tipo: 'credito', horas: '10:00:00' },
+        { tipo: 'debito', horas: '04:00:00' },
+        { tipo: 'credito', horas: '02:00:00' },
       ]);
       const saldo = await bancoHorasService.getSaldo('colab-1');
       expect(saldo).toBe(8); // 10 - 4 + 2
@@ -103,26 +110,26 @@ describe('bancoHorasService', () => {
 
     it('treats unrecognized tipo as debito (subtracts)', async () => {
       setupSaldo([
-        { tipo: 'credito', quantidade_horas: '10' },
-        { tipo: 'outro', quantidade_horas: '3' },
+        { tipo: 'credito', horas: '10:00:00' },
+        { tipo: 'outro', horas: '03:00:00' },
       ]);
       const saldo = await bancoHorasService.getSaldo('colab-1');
       expect(saldo).toBe(7);
     });
 
-    it('handles quantidade_horas with decimal values', async () => {
+    it('handles horas with minutes (interval HH:MM:SS)', async () => {
       setupSaldo([
-        { tipo: 'credito', quantidade_horas: '1.5' },
-        { tipo: 'debito', quantidade_horas: '0.5' },
+        { tipo: 'credito', horas: '01:30:00' },
+        { tipo: 'debito', horas: '00:30:00' },
       ]);
       const saldo = await bancoHorasService.getSaldo('colab-1');
       expect(saldo).toBeCloseTo(1.0, 5);
     });
 
-    it('handles invalid quantidade_horas (non-numeric) as 0', async () => {
+    it('handles invalid horas interval (non-parseable) as 0', async () => {
       setupSaldo([
-        { tipo: 'credito', quantidade_horas: 'abc' },
-        { tipo: 'credito', quantidade_horas: '5' },
+        { tipo: 'credito', horas: 'invalid' },
+        { tipo: 'credito', horas: '05:00:00' },
       ]);
       const saldo = await bancoHorasService.getSaldo('colab-1');
       expect(saldo).toBe(5); // 0 + 5
@@ -137,14 +144,14 @@ describe('bancoHorasService', () => {
   // registrar
   describe('registrar', () => {
     it('calls insert and returns data', async () => {
-      const inserted = { id: 'bh-1', tipo: 'credito', quantidade_horas: '8' };
+      const inserted = { id: 'bh-1', tipo: 'credito', horas: '08:00:00' };
       const maybeSingle = vi.fn().mockResolvedValue({ data: inserted, error: null });
       const select = vi.fn().mockReturnValue({ maybeSingle });
       const insert = vi.fn().mockReturnValue({ select });
       mockFrom.mockReturnValue({ insert });
 
-      const result = await bancoHorasService.registrar({ tipo: 'credito', quantidade_horas: '8' });
-      expect(insert).toHaveBeenCalledWith({ tipo: 'credito', quantidade_horas: '8' });
+      const result = await bancoHorasService.registrar({ tipo: 'credito', horas: '08:00:00' });
+      expect(insert).toHaveBeenCalledWith({ tipo: 'credito', horas: '08:00:00' });
       expect(result).toEqual(inserted);
     });
 
