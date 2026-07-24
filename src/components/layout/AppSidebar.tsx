@@ -462,7 +462,7 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
               </Tooltip>
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={handleLogout}><LogOut className="w-4 h-4" /></Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={handleLogout} aria-label="Sair"><LogOut className="w-4 h-4" /></Button>
                 </TooltipTrigger>
                 <TooltipContent side="right">Sair</TooltipContent>
               </Tooltip>

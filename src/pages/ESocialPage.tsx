@@ -269,11 +269,12 @@ export default function ESocialPage() {
                       {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                       Transmitir Lote
                     </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="h-9 w-9 rounded-xl text-muted-foreground hover:text-destructive"
                       onClick={() => setSelectedIds([])}
+                      aria-label="Limpar seleção"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
