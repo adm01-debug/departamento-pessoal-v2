@@ -8,9 +8,9 @@ import { calcularINSS as calcINSS, calcularIRRF as calcIRRF } from '@/calculator
 describe('calcINSS — Tabela Progressiva 2026', () => {
   // Bracket boundaries
   const FAIXA1_TETO = 1621.00;
-  const FAIXA2_TETO = 2793.88;
-  const FAIXA3_TETO = 4190.83;
-  const FAIXA4_TETO = 8157.41;
+  const FAIXA2_TETO = 2902.84;
+  const FAIXA3_TETO = 4354.27;
+  const FAIXA4_TETO = 8475.55;
 
   describe('edge cases', () => {
     it('salary = 0 → INSS = 0', () => expect(calcINSS(0)).toBe(0));
@@ -27,7 +27,7 @@ describe('calcINSS — Tabela Progressiva 2026', () => {
     it('R$ 1.621,00 (teto)', () => expect(calcINSS(FAIXA1_TETO)).toBeCloseTo(121.57, 2));
   });
 
-  describe('faixa 2 — 9% de R$ 1.621,01 a R$ 2.793,88', () => {
+  describe('faixa 2 — 9% de R$ 1.621,01 a R$ 2.902,84', () => {
     it('R$ 1.621,01', () => {
       const expected = FAIXA1_TETO * 0.075 + 0.01 * 0.09;
       expect(calcINSS(1621.01)).toBeCloseTo(expected, 2);
@@ -42,7 +42,7 @@ describe('calcINSS — Tabela Progressiva 2026', () => {
     });
   });
 
-  describe('faixa 3 — 12% de R$ 2.793,89 a R$ 4.190,83', () => {
+  describe('faixa 3 — 12% de R$ 2.902,85 a R$ 4.354,27', () => {
     it('R$ 3.500', () => {
       const expected = FAIXA1_TETO * 0.075 + (FAIXA2_TETO - FAIXA1_TETO) * 0.09 + (3500 - FAIXA2_TETO) * 0.12;
       expect(calcINSS(3500)).toBeCloseTo(expected, 2);
@@ -53,7 +53,7 @@ describe('calcINSS — Tabela Progressiva 2026', () => {
     });
   });
 
-  describe('faixa 4 — 14% de R$ 4.190,84 a R$ 8.157,41', () => {
+  describe('faixa 4 — 14% de R$ 4.354,28 a R$ 8.475,55', () => {
     it('R$ 5.000', () => {
       const expected = FAIXA1_TETO * 0.075 + (FAIXA2_TETO - FAIXA1_TETO) * 0.09 + (FAIXA3_TETO - FAIXA2_TETO) * 0.12 + (5000 - FAIXA3_TETO) * 0.14;
       expect(calcINSS(5000)).toBeCloseTo(expected, 2);
@@ -65,7 +65,7 @@ describe('calcINSS — Tabela Progressiva 2026', () => {
     });
   });
 
-  describe('teto — acima de R$ 8.157,41', () => {
+  describe('teto — acima de R$ 8.475,55', () => {
     it('R$ 10.000 = mesmo que teto', () => expect(calcINSS(10000)).toBeCloseTo(calcINSS(FAIXA4_TETO), 2));
     it('R$ 50.000 = mesmo que teto', () => expect(calcINSS(50000)).toBeCloseTo(calcINSS(FAIXA4_TETO), 2));
     it('R$ 100.000 = mesmo que teto', () => expect(calcINSS(100000)).toBeCloseTo(calcINSS(FAIXA4_TETO), 2));
