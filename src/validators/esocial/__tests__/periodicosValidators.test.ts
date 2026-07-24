@@ -201,7 +201,7 @@ describe('validarS1020', () => {
   });
 
   it('returns error when tpLotacao is invalid', () => {
-    const r = validarS1020({ ...VALID, tpLotacao: '99' });
+    const r = validarS1020({ ...VALID, tpLotacao: '11' });
     expect(r.errors.some(e => e.campo === 'tpLotacao')).toBe(true);
   });
 
