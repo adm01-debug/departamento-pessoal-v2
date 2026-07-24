@@ -1,15 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
-const { mockUseQuery, mockUseMutation, mockUseQueryClient, mockInvalidate } = vi.hoisted(() => {
-  const mockInvalidate = vi.fn();
-  return {
-    mockUseQuery: vi.fn(),
-    mockUseMutation: vi.fn(),
-    mockUseQueryClient: vi.fn(() => ({ invalidateQueries: mockInvalidate })),
-    mockInvalidate,
-  };
-});
+const { mockUseQuery, mockUseMutation, mockUseQueryClient } = vi.hoisted(() => ({
+  mockUseQuery: vi.fn(),
+  mockUseMutation: vi.fn(),
+  mockUseQueryClient: vi.fn(() => ({ invalidateQueries: vi.fn() })),
+}));
 
 vi.mock('@tanstack/react-query', () => ({
   useQuery: mockUseQuery,
