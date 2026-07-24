@@ -86,7 +86,7 @@ describe('UnifiedAuditSection', () => {
       refetch: vi.fn(),
     } as any);
     // Simulate enabled state by rendering with data
-    const { rerender } = render(<UnifiedAuditSection />);
+    render(<UnifiedAuditSection />);
     // Click Buscar to enable
     await userEvent.click(screen.getByText('Buscar'));
     vi.mocked(useQuery).mockReturnValueOnce({
