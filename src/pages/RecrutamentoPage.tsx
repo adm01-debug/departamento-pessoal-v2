@@ -310,7 +310,7 @@ export default function RecrutamentoPage() {
                                    {cand.pretensao_salarial ? `R$ ${cand.pretensao_salarial.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'N/D'}
                                  </td>
                                  <td className="px-6 py-4 text-right">
-                                   <Button variant="ghost" size="icon" className="rounded-xl hover:bg-primary/10 text-primary opacity-0 group-hover:opacity-100 transition-all"><Plus className="h-4 w-4" /></Button>
+                                   <Button variant="ghost" size="icon" aria-label="Adicionar" className="rounded-xl hover:bg-primary/10 text-primary opacity-0 group-hover:opacity-100 transition-all"><Plus className="h-4 w-4" /></Button>
                                  </td>
                                </tr>
                              ))}
