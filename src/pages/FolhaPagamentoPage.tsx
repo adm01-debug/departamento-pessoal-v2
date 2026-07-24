@@ -11,8 +11,8 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { useIdempotencyKey } from '@/hooks/useIdempotencyKey';
-import { auditLogger } from '@/utils/auditLogger';
 import { useDataAccessLog } from '@/hooks/useDataAccessLog';
+import { folhaPagamentoService } from '@/services/folhaPagamentoService';
 import { safeErrorMessage } from '@/utils/safeError';
 import { Card, CardContent } from '@/components/ui/card';
 import { FolhaKPIs, FolhaPipeline, FolhaValidationAlerts, FolhaComposicao, Simulador13Dialog, SimuladorWhatIf, CNABDialog, RelatorioContabilDialog, FGTSDigitalDashboard, RubricasDialog, CalculoFolhaWizard, PagamentoBancarioWizard, FolhaAuditTimeline, FolhaDashboard, FolhaESocialSync } from '@/components/folha';
@@ -112,30 +112,6 @@ export default function FolhaPagamentoPage() {
 
   useDataAccessLog('folhas_pagamento', resumo?.id, empresaAtual?.id);
 
-  const calcularFolha = useMutation({
-    mutationFn: async (comp: string) => {
-      const [mes, ano] = comp.split('/');
-      const competenciaDB = `${ano}-${mes}`;
-      const { data: existing } = await supabase.from('folhas_pagamento').select('id').eq('competencia', competenciaDB).maybeSingle();
-      if (existing) {
-        const { data, error } = await supabase.from('folhas_pagamento')
-          .update({ status: 'calculada' as const, data_calculo: new Date().toISOString() })
-          .eq('id', existing.id).select().single();
-        if (error) throw error;
-        return data;
-      }
-      const { data, error } = await supabase.from('folhas_pagamento')
-        .insert({ competencia: competenciaDB, tipo: 'mensal' }).select().single();
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['folha-resumo', competencia] });
-      toast.success('Folha calculada com sucesso!');
-    },
-    onError: (error: Error) => toast.error(safeErrorMessage(error, 'Erro na operação da folha.')),
-  });
-
   const { key: idemKey, reset: idemReset } = useIdempotencyKey();
   const calcularFolhaServidor = async () => {
     setCalcServidor(true);
@@ -163,24 +139,14 @@ export default function FolhaPagamentoPage() {
   const encerrarFolha = useMutation({
     mutationFn: async () => {
       if (!resumo?.id) throw new Error('Nenhuma folha encontrada para encerramento');
-      const { data, error } = await supabase.from('folhas_pagamento')
-        .update({ status: 'fechada' as any, data_fechamento: new Date().toISOString() })
-        .eq('id', resumo.id).select().single();
-      if (error) throw error;
-      
-      await auditLogger.log({
-        tabela: 'folhas_pagamento',
-        registro_id: resumo.id,
-        acao: 'UPDATE',
-        dados_novos: { status: 'fechada', evento: 'ENCERRAMENTO_FOLHA' }
-      });
-      return data;
+      // Delega ao serviço: validação de alertas críticos + locking otimista + edge function fechar-folha
+      return folhaPagamentoService.fecharFolha(resumo.id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['folha-resumo', competencia] });
       toast.success('Folha de pagamento encerrada com sucesso!');
     },
-    onError: (error: Error) => toast.error(safeErrorMessage(error, 'Erro na operação da folha.')),
+    onError: (error: Error) => toast.error(safeErrorMessage(error, 'Erro no encerramento da folha.')),
   });
 
 
