@@ -43,6 +43,7 @@ export function FeriasActions(props: FeriasActionsProps) {
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label={label}
                   className={`h-7 w-7 rounded-lg ${color}`}
                   onClick={() => handler(solicitacao.id)}
                 >
@@ -59,6 +60,7 @@ export function FeriasActions(props: FeriasActionsProps) {
             <Button
               variant="ghost"
               size="icon"
+              aria-label="Baixar"
               className="h-7 w-7 rounded-lg hover:bg-primary/10 text-primary"
               onClick={() => feriasPDF.gerarRecibo(solicitacao)}
             >
@@ -73,6 +75,7 @@ export function FeriasActions(props: FeriasActionsProps) {
             <Button
               variant="ghost"
               size="icon"
+              aria-label="Cancelar"
               className="h-7 w-7 rounded-lg hover:bg-destructive/10 text-destructive"
               onClick={() => props.onCancelar(solicitacao.id)}
             >

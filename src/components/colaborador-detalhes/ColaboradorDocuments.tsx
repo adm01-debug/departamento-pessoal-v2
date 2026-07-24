@@ -178,6 +178,7 @@ export function ColaboradorDocuments({ colaboradorId }: { colaboradorId: string 
                         <Button
                           variant="ghost"
                           size="icon"
+                          aria-label="Abrir em nova aba"
                           className="h-8 w-8 rounded-lg hover:bg-info/10 text-info"
                           onClick={() => window.open(doc.url, '_blank')}
                         >
@@ -187,6 +188,7 @@ export function ColaboradorDocuments({ colaboradorId }: { colaboradorId: string 
                       <Button
                         variant="ghost"
                         size="icon"
+                        aria-label="Excluir"
                         className="h-8 w-8 rounded-lg hover:bg-destructive/10 text-destructive"
                         onClick={() => {
                           if (confirm('Tem certeza que deseja excluir este documento permanentemente?')) {

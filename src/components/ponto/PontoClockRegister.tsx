@@ -194,7 +194,7 @@ export function PontoClockRegister({ time, loading, geoStatus, onRegistrar, ulti
               </Badge>
             )}
             {offlineQueueSize > 0 && navigator.onLine && (
-              <Button variant="ghost" size="icon" className="h-6 w-6 ml-1" onClick={handleSync} disabled={isSyncing}>
+              <Button variant="ghost" size="icon" aria-label="Atualizar" className="h-6 w-6 ml-1" onClick={handleSync} disabled={isSyncing}>
                 <RefreshCw className={cn("h-3 w-3", isSyncing && "animate-spin")} />
               </Button>
             )}

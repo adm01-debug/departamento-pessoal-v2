@@ -165,7 +165,7 @@ export function MedidasTable({ data, onMarcarCiencia, onExcluir }: MedidasTableP
                         {m.documento_url && (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg" asChild>
+                              <Button size="icon" variant="ghost" aria-label="Abrir em nova aba" className="h-7 w-7 rounded-lg" asChild>
                                 <a href={m.documento_url} target="_blank" rel="noopener noreferrer">
                                   <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
                                 </a>
@@ -176,7 +176,7 @@ export function MedidasTable({ data, onMarcarCiencia, onExcluir }: MedidasTableP
                         )}
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg" onClick={() => onExcluir(m.id)}>
+                            <Button size="icon" variant="ghost" aria-label="Excluir" className="h-7 w-7 rounded-lg" onClick={() => onExcluir(m.id)}>
                               <Trash2 className="h-3.5 w-3.5 text-destructive" />
                             </Button>
                           </TooltipTrigger>
@@ -230,7 +230,7 @@ export function MedidasTable({ data, onMarcarCiencia, onExcluir }: MedidasTableP
                         Ciência
                       </Button>
                     )}
-                    <Button size="icon" variant="ghost" className="h-7 w-7 rounded-lg" onClick={() => onExcluir(m.id)}>
+                    <Button size="icon" variant="ghost" aria-label="Excluir" className="h-7 w-7 rounded-lg" onClick={() => onExcluir(m.id)}>
                       <Trash2 className="h-3.5 w-3.5 text-destructive" />
                     </Button>
                   </div>
