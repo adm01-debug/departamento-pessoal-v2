@@ -1,0 +1,47 @@
+REVOKE EXECUTE ON FUNCTION public.has_role(uuid, app_role) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.is_admin(uuid) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.get_user_roles(uuid) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.get_user_default_empresa(uuid) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.get_user_empresas(uuid) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.user_belongs_to_empresa(uuid, uuid) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.anonimizar_dados_pessoais(uuid) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.fn_link_gov_br_account(uuid, text, text) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.processar_ajuste_aprovado(uuid) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.get_colaborador_banco_horas(uuid) FROM PUBLIC;
+
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, app_role) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.is_admin(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_user_roles(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_user_default_empresa(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_user_empresas(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.user_belongs_to_empresa(uuid, uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.anonimizar_dados_pessoais(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.fn_link_gov_br_account(uuid, text, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.processar_ajuste_aprovado(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_colaborador_banco_horas(uuid) TO authenticated;
+
+-- Mesmo padrão para as funções de trigger (Onda 5 só revogou de authenticated, PUBLIC ainda concedia)
+REVOKE EXECUTE ON FUNCTION public.check_processamento_timeout() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.fn_alert_severe_disciplinary_measure() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.fn_audit_biometric_failure() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.fn_auto_generate_training_certificate() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.fn_consolidar_batidas() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.fn_create_default_onboarding_tasks() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.fn_enqueue_notification() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.fn_trigger_whatsapp_on_event() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.fn_update_admissao_checklist() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.fn_update_candidatura_history() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.fn_workflow_admissao_auto() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user_role() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.log_audit_change() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.log_esocial_transmission() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.process_audit_log() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.process_ferias_audit() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.processar_auditoria_premiacao() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.registrar_auditoria_contratual() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.registrar_auditoria_ponto() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.validate_ponto_compliance() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.gerar_alertas_preditivos_ia() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.limpar_govbr_states_expirados() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.detectar_fraude_ponto(uuid, uuid, numeric, numeric, timestamptz) FROM PUBLIC;

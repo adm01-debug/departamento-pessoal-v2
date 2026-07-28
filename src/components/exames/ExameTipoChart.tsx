@@ -1,0 +1,77 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { motion } from 'framer-motion';
+
+const tipoLabels: Record<string, string> = {
+  admissional: 'Admissional',
+  periodico: 'Periódico',
+  retorno_trabalho: 'Retorno',
+  mudanca_funcao: 'Mud. Função',
+  demissional: 'Demissional',
+};
+
+const tipoColors: Record<string, string> = {
+  admissional: 'bg-primary',
+  periodico: 'bg-primary/70',
+  retorno_trabalho: 'bg-accent',
+  mudanca_funcao: 'bg-warning/70',
+  demissional: 'bg-destructive/60',
+};
+
+interface ExameTipoChartProps {
+  data: any[];
+}
+
+export function ExameTipoChart({ data }: ExameTipoChartProps) {
+  const total = data.length || 1;
+  const tipos = Object.keys(tipoLabels);
+  const distribution = tipos.map(t => ({
+    key: t,
+    label: tipoLabels[t],
+    count: data.filter((e: any) => e.tipo === t).length,
+    color: tipoColors[t] || 'bg-muted-foreground/40',
+  })).filter(c => c.count > 0);
+
+  return (
+    <Card className="border border-border/30 shadow-elevated rounded-2xl">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base font-display">Exames por Tipo</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <TooltipProvider>
+          <div className="space-y-2.5">
+            {distribution.map((cat, i) => {
+              const pct = Math.round((cat.count / total) * 100);
+              return (
+                <Tooltip key={cat.key}>
+                  <TooltipTrigger asChild>
+                    <div className="space-y-1 cursor-default">
+                      <div className="flex justify-between text-xs font-body">
+                        <span className="text-muted-foreground">{cat.label}</span>
+                        <span className="font-medium">{cat.count} ({pct}%)</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-muted/50 overflow-hidden">
+                        <motion.div
+                          className={`h-full rounded-full ${cat.color}`}
+                          initial={{ width: 0 }}
+                          animate={{ width: `${pct}%` }}
+                          transition={{ delay: 0.2 + i * 0.08, duration: 0.5, ease: 'easeOut' }}
+                        />
+                      </div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="text-xs">
+                    {cat.count} exame{cat.count > 1 ? 's' : ''} do tipo {cat.label}
+                  </TooltipContent>
+                </Tooltip>
+              );
+            })}
+            {distribution.length === 0 && (
+              <p className="text-xs text-muted-foreground text-center py-4">Nenhum exame registrado</p>
+            )}
+          </div>
+        </TooltipProvider>
+      </CardContent>
+    </Card>
+  );
+}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- MP-004 (hardened): CSP em modo enforce. Notas:
+         - 'unsafe-eval' removido de script-src (Vite/SWC prod não requerem).
+         - 'unsafe-inline' em script-src mantido apenas por compat. com o
+           bundle inicial injetado pelo Vite; migrar para nonces em próxima
+           iteração server-side.
+         - upgrade-insecure-requests força https em qualquer subresource http.
+         - worker-src blob: necessário para o service worker da vite-plugin-pwa.
+         - frame-src 'none' bloqueia iframes de terceiros (nenhum é usado). -->
+    <!-- QA V26: `frame-ancestors` removido — a diretiva é ignorada quando entregue via <meta>
+         (gera console warning). Deve ser configurada apenas via header HTTP no servidor. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://*.lovable.app https://*.lovable.dev https://*.sentry.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.lovable.app https://*.lovable.dev https://api.pwnedpasswords.com https://*.sentry.io https://viacep.com.br https://brasilapi.com.br; worker-src 'self' blob:; manifest-src 'self'; media-src 'self' blob: data:; frame-src 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests;" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>Sistema DP - Departamento Pessoal</title>
+    <meta name="description" content="Sistema de Departamento Pessoal - Gestão completa de RH, folha de pagamento, ponto e benefícios">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="canonical" href="https://sistema-dp.lovable.app/" />
+
+    <!-- Preload fonts (non-blocking) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" crossorigin="anonymous" />
+
+    <!-- Open Graph -->
+    
+    
+    <meta property="og:type" content="website" />
+    
+  
+  
+  
+  <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/84bc3370-cd98-4a09-9bdc-562518bc9a18/id-preview-5a2aa0e4--37ea6b57-7d44-46af-928b-1e9b97bca9fa.lovable.app-1775135483434.png">
+  <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/84bc3370-cd98-4a09-9bdc-562518bc9a18/id-preview-5a2aa0e4--37ea6b57-7d44-46af-928b-1e9b97bca9fa.lovable.app-1775135483434.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Sistema DP - Departamento Pessoal",
+        "operatingSystem": "Web",
+        "applicationCategory": "BusinessApplication",
+        "description": "Sistema completo para gestão de RH, folha de pagamento, ponto eletrônico e benefícios.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "BRL"
+        }
+      }
+    </script>
+  <meta property="og:title" content="Sistema DP - Departamento Pessoal">
+  <meta name="twitter:title" content="Sistema DP - Departamento Pessoal">
+  <meta property="og:description" content="Sistema de Departamento Pessoal - Gestão completa de RH, folha de pagamento, ponto e benefícios">
+  <meta name="twitter:description" content="Sistema de Departamento Pessoal - Gestão completa de RH, folha de pagamento, ponto e benefícios">
+</head>
+  <body>
+    <a href="#root" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[9999] focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded-md focus:shadow-lg">Pular para o conteúdo principal</a>
+    <div id="root" role="main" aria-label="Conteúdo principal"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+
+</html>

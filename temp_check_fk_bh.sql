@@ -1,0 +1,1 @@
+SELECT conname, conrelid::regclass AS from_table, confrelid::regclass AS to_table FROM pg_constraint WHERE conrelid::regclass::text IN ('banco_horas','batidas_ponto','registros_ponto') AND contype = 'f';

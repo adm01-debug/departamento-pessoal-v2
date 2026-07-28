@@ -1,0 +1,17 @@
+# Default
+* @adm01-debug
+
+# CI/CD
+.github/workflows/ @adm01-debug
+
+# Deploy
+Dockerfile @adm01-debug
+nginx.conf @adm01-debug
+
+# Core
+src/ @adm01-debug
+supabase/ @adm01-debug
+scripts/ @adm01-debug
+
+# Docs
+*.md @adm01-debug

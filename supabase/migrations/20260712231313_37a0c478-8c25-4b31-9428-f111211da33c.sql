@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.fwd_to_audit_unified() FROM anon, authenticated, PUBLIC;

@@ -1,0 +1,13 @@
+.next
+dist
+build
+node_modules
+coverage
+playwright-report
+test-results
+src/integrations/supabase/types.ts
+supabase/functions/**/*.ts
+public
+*.min.*
+bun.lockb
+package-lock.json

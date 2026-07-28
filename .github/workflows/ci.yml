@@ -1,0 +1,89 @@
+name: Continuous Integration & Delivery
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Type Check
+        run: npm run typecheck
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Lint
+        run: npm run lint:ci
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || '' }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Unit Tests
+        run: npm run test:coverage
+
+  edge-functions:
+    name: Edge Functions (deno check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check external-db-bridge (gate crítico)
+        # Verifica o bridge com zero tolerância — validado com 0 erros desde M6.
+        # Este é o único edge function com acesso a DB externo; erros de tipo
+        # aqui causam falhas silenciosas em produção.
+        run: deno check --no-lock supabase/functions/external-db-bridge/index.ts
+      - name: Type-check demais edge functions (informativo)
+        # Passa mesmo com erros — apenas gera relatório para rastreamento progressivo.
+        # As demais funções serão migradas gradualmente para zero erros.
+        continue-on-error: true
+        run: |
+          ERRORS=0
+          for fn in supabase/functions/*/index.ts; do
+            dir=$(dirname "$fn")
+            name=$(basename "$dir")
+            if [ "$name" = "external-db-bridge" ]; then continue; fi
+            if ! deno check --no-lock "$fn" 2>/dev/null; then
+              ERRORS=$((ERRORS+1))
+              echo "  ⚠ $name: erros de tipo (não bloqueia)"
+            fi
+          done
+          echo "Funções com erros de tipo (não-bridge): $ERRORS"

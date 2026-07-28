@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -X POST \"https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/auth-login\" -H \"Content-Type: application/json\" -H \"Origin: http://localhost:8080\" -d \"{\\\\\"email\\\\\":\\\\\"ti@promobrindes.com.br\\\\\",\\\\\"password\\\\\":\\\\\"Promo2026\\\\\"}\")",
+      "Bash(curl -s -i -X POST \"https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/auth-login\" -H \"Content-Type: application/json\" -H \"Origin: http://localhost:8080\" -d \"{\\\\\"email\\\\\":\\\\\"ti@promobrindes.com.br\\\\\",\\\\\"password\\\\\":\\\\\"Promo2026\\\\\"}\")",
+      "Bash(findstr /i \"secret env key config setting\")",
+      "Bash(curl -s -X POST \"https://frjbfeamybqsejlvmqbl.supabase.co/auth/v1/token?grant_type=password\" -H \"Content-Type: application/json\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyamJmZWFteWJxc2VqbHZtcWJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NDA3NTYsImV4cCI6MjAwMDIxNjc1Nn0.Example\" -d \"{\\\\\"email\\\\\":\\\\\"ti@promobrindes.com.br\\\\\",\\\\\"password\\\\\":\\\\\"Promo2026\\\\\"}\")",
+      "Bash(node -e \"const t='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyamJmZWFteWJxc2VqbHZtcWJsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NDY0MDc1NiwiZXhwIjoyMTAwMjE2NzU2fQ.RmOZEIwYZ8rvbjdKrxXJS6fTEnqQh91iEjY0WYbaGfs'; const p=JSON.parse\\(Buffer.from\\(t.split\\('.'\\)[1],'base64'\\).toString\\(\\)\\); console.log\\('anon key payload:', JSON.stringify\\({role:p.role,ref:p.ref,iat:p.iat,exp:p.exp},null,2\\)\\);\")",
+      "Bash(curl -s -X POST \"https://frjbfeamybqsejlvmqbl.supabase.co/auth/v1/token?grant_type=password\" -H \"Content-Type: application/json\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyamJmZWFteWJxc2VqbHZtcWJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NDA3NTYsImV4cCI6MjEwMDIxNjc1Nn0.yrnnKshNB_89tmJtHbyaZGnsOHuAEV6x5OFrcepBYIU\" -d \"{\\\\\"email\\\\\":\\\\\"ti@promobrindes.com.br\\\\\",\\\\\"password\\\\\":\\\\\"Promo2026\\\\\"}\")",
+      "Bash(curl -s \"https://frjbfeamybqsejlvmqbl.supabase.co/logs/v1/edge-functions/auth-login\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyamJmZWFteWJxc2VqbHZtcWJsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NDY0MDc1NiwiZXhwIjoyMTAwMjE2NzU2fQ.RmOZEIwYZ8rvbjdKrxXJS6fTEnqQh91iEjY0WYbaGfs\")",
+      "Bash(curl -s -i -X POST \"https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/external-db-bridge\" -H \"Content-Type: application/json\" -H \"Origin: http://localhost:8080\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyamJmZWFteWJxc2VqbHZtcWJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NDA3NTYsImV4cCI6MjEwMDIxNjc1Nn0.yrnnKshNB_89tmJtHbyaZGnsOHuAEV6x5OFrcepBYIU\" -d '{\"action\":\"query\",\"sql\":\"SELECT 1 as test\"}')",
+      "Bash(node -e ' *)",
+      "PowerShell(supabase secrets list --project-ref frjbfeamybqsejlvmqbl 2>&1)"
+    ],
+    "additionalDirectories": [
+      "d:\\tmp"
+    ]
+  }
+}

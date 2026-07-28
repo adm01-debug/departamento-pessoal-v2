@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:supabase-deptpessoal-gw.adm01.workers.dev)",
+      "Bash(curl -s -X POST \"https://supabase-deptpessoal-gw.adm01.workers.dev/5EBFNuvM1GmbhTIWai41exPYcQLwjUY_/mcp\" -H \"Content-Type: application/json\" -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\",\"params\":{}}')",
+      "Bash(curl -s -X POST \"https://supabase-deptpessoal-gw.adm01.workers.dev/5EBFNuvM1GmbhTIWai41exPYcQLwjUY_/mcp\" -H \"Content-Type: application/json\" -d '{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"supabase_functions_list\",\"arguments\":{}}}')",
+      "Bash(curl -s -X POST \"https://supabase-deptpessoal-gw.adm01.workers.dev/5EBFNuvM1GmbhTIWai41exPYcQLwjUY_/mcp\" -H \"Content-Type: application/json\" -d '{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/call\",\"params\":{\"name\":\"supabase_db_overview\",\"arguments\":{}}}')",
+      "Bash(curl -s -X POST \"https://supabase-deptpessoal-gw.adm01.workers.dev/5EBFNuvM1GmbhTIWai41exPYcQLwjUY_/mcp\" -H \"Content-Type: application/json\" -d '{\"jsonrpc\":\"2.0\",\"id\":4,\"method\":\"tools/call\",\"params\":{\"name\":\"supabase_functions_ping\",\"arguments\":{\"name\":\"auth-login\"}}}')",
+      "Bash(curl -s -X POST \"https://supabase-deptpessoal-gw.adm01.workers.dev/5EBFNuvM1GmbhTIWai41exPYcQLwjUY_/mcp\" -H \"Content-Type: application/json\" -d '{\"jsonrpc\":\"2.0\",\"id\":5,\"method\":\"tools/call\",\"params\":{\"name\":\"supabase_functions_ping\",\"arguments\":{\"name\":\"external-db-bridge\"}}}')",
+      "Bash(curl -s -X POST \"https://supabase-deptpessoal-gw.adm01.workers.dev/5EBFNuvM1GmbhTIWai41exPYcQLwjUY_/mcp\" -H \"Content-Type: application/json\" -d '{\"jsonrpc\":\"2.0\",\"id\":6,\"method\":\"tools/call\",\"params\":{\"name\":\"supabase_functions_ping\",\"arguments\":{\"name\":\"healthcheck\"}}}')",
+      "Bash(curl -s -X POST \"https://supabase-deptpessoal-gw.adm01.workers.dev/5EBFNuvM1GmbhTIWai41exPYcQLwjUY_/mcp\" -H \"Content-Type: application/json\" -d '{\"jsonrpc\":\"2.0\",\"id\":10,\"method\":\"tools/call\",\"params\":{\"name\":\"supabase_functions_list\",\"arguments\":{}}}')",
+      "Bash(xargs sed -i 's/catch \\(error: unknown\\)/catch \\(error\\)/g')",
+      "Bash(xargs sed -i \"s/captureException\\(error,/captureException\\(error as Error,/g\")",
+      "Bash(python -c ' *)",
+      "Bash(node -e \"const fs=require\\('fs'\\); const c=fs.readFileSync\\('d:/Projetos/departamento-pessoal-v2-main/supabase/functions/alertas-dp/index.ts','utf8'\\); const o=\\(c.match\\(/{/g\\)||[]\\).length; const cl=\\(c.match\\(/}/g\\)||[]\\).length; const op=\\(c.match\\(/\\\\\\\\\\(/g\\)||[]\\).length; const cp=\\(c.match\\(/\\\\\\\\\\)/g\\)||[]\\).length; console.log\\('Braces: '+o+' open, '+cl+' close, diff='+\\(o-cl\\)\\); console.log\\('Parens: '+op+' open, '+cp+' close, diff='+\\(op-cp\\)\\);\")",
+      "Bash(node -e ' *)",
+      "Bash(npm list *)",
+      "Bash(curl -s -X OPTIONS https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/external-db-bridge -H 'Origin: http://localhost:8080' -H 'Access-Control-Request-Method: POST' -H 'Access-Control-Request-Headers: authorization,content-type' -i)",
+      "Bash(curl -s -X OPTIONS https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/auth-login -H 'Origin: http://localhost:8080' -H 'Access-Control-Request-Method: POST' -H 'Access-Control-Request-Headers: content-type' -i)",
+      "Bash(npx supabase *)",
+      "Bash(curl -s -X OPTIONS http://localhost:54321/functions/v1/auth-login -H 'Origin: http://localhost:8080' -H 'Access-Control-Request-Method: POST' -H 'Access-Control-Request-Headers: content-type' -i)",
+      "Bash(curl -s -X OPTIONS https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/auth-login -H 'Origin: http://localhost:8080' -H 'Access-Control-Request-Method: POST' -H 'Access-Control-Request-Headers: authorization,content-type,apikey,x-client-info' -i)",
+      "Bash(curl -s -X POST https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/auth-login -H 'Origin: http://localhost:8080' -H 'Content-Type: application/json' -H 'Authorization: Bearer test' -H 'apikey: dummy' -d '{\"email\":\"x@x.com\",\"password\":\"x\"}' -i)",
+      "Bash(curl -s -X OPTIONS https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/external-db-bridge -H 'Origin: http://localhost:8080' -H 'Access-Control-Request-Method: POST' -H 'Access-Control-Request-Headers: authorization,content-type,apikey' -i)",
+      "Bash(curl -s -X POST https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/auth-login -H 'Content-Type: application/json' -H 'Authorization: Bearer fake' -H 'apikey: fake' -H 'Origin: http://localhost:8080' -d '{\"email\":\"test@test.com\",\"password\":\"test\"}')",
+      "Bash(curl -s -X POST https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/auth-login -H 'Content-Type: application/json' -H 'Origin: http://localhost:8080' -d '{\"email\":\"test@test.com\",\"password\":\"test\"}' -i)",
+      "Bash(grep -oE \"\\\\\"name\\\\\":\\\\\"[^\\\\\"]+\\\\\"\" \"/c/Users/TI-01/.claude/projects/d--Projetos-departamento-pessoal-v2-main/fec754cb-ee0d-4726-9e09-c681f69150cb/tool-results/bxynlgbf3.txt\" 2>/dev/null | grep -iE \"log|edge|function|deplo\" | head -20)",
+      "Read(//c/Users/TI-01/.claude/projects/d--Projetos-departamento-pessoal-v2-main/fec754cb-ee0d-4726-9e09-c681f69150cb/tool-results/**)",
+      "Bash(xargs grep -L \"corsHeaders\\(req\\)\")",
+      "Bash(curl -s -X POST https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/auth-login -H 'Content-Type: application/json' -H 'Origin: http://localhost:8080' -d '{}' -i)",
+      "Bash(curl -s -X POST https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/auth-login -H 'Content-Type: application/json' -H 'Origin: http://localhost:8080' -d '{\"email\":\"bad\",\"password\":\"\"}' -i)",
+      "Bash(curl -s -X POST https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/external-db-bridge -H 'Content-Type: application/json' -H 'Origin: http://localhost:8080' -H 'Authorization: Bearer fake' -H 'apikey: fake' -d '{\"action\":\"select\",\"table\":\"empresas\",\"limit\":1}' -i)",
+      "Bash(curl -s -X POST https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/external-db-bridge -H 'Content-Type: application/json' -H 'Origin: http://localhost:8080' -H 'apikey: fake' -d '{\"action\":\"select\",\"table\":\"empresas\",\"limit\":1}' -i)",
+      "Bash(curl -s -X POST https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/external-db-bridge -H 'Content-Type: application/json' -H 'Origin: http://localhost:8080' -H 'apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyamJmZWFteWJxc2VqbHZtcWJsIn0.fake' -d '{\"action\":\"select\",\"table\":\"empresas\",\"limit\":1}' -i)",
+      "Bash(curl -s -X POST https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/external-db-bridge -H 'Content-Type: application/json' -H 'Origin: http://localhost:8080' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyamJmZWFteWJxc2VqbHZtcWJsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSJ9.fake' -H 'apikey: fake' -d '{\"action\":\"select\",\"table\":\"empresas\",\"limit\":1}' -i)",
+      "Bash(curl -s -I https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/external-db-bridge -H 'Origin: http://localhost:8080')",
+      "Bash(curl -s https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/external-db-bridge -H 'Origin: http://localhost:8080' -i)",
+      "Bash(curl -s -X POST https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/auth-login -H 'Origin: http://localhost:8080' -H 'Content-Type: application/json' -d '{}' -i)",
+      "Bash(curl -s -X POST \"https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/auth-login\" -H \"Content-Type: application/json\" -H \"Origin: http://localhost:8080\" -d '{}' -i)",
+      "Bash(curl -s -X POST https://frjbfeamybqsejlvmqbl.supabase.co/functions/v1/external-db-bridge -H 'Content-Type: application/json' -H 'Origin: http://localhost:8080' -H 'apikey: test' -H 'Authorization: Bearer test' -d '{\"action\":\"rpc\",\"fn\":\"check_login_lock\",\"params\":{}}' -i)"
+    ]
+  }
+}
