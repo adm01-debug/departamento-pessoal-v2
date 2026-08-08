@@ -18,7 +18,6 @@ import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { BarChart2, Calendar, CheckCircle2, Clock, History, LayoutGrid, Plus, Star, Target, Trash2, TrendingUp, Users } from 'lucide-react';
-import { colaboradorService } from '@/services/colaboradorService';
 import { PerformanceDashboard } from '@/components/avaliacao/PerformanceDashboard';
 import { NineBoxMatrix } from '@/components/avaliacao/NineBoxMatrix';
 import { PerformanceAuditTimeline } from '@/components/avaliacao/PerformanceAuditTimeline';
