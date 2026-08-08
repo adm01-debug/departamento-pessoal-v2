@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Input } from './input';
 import { Button } from './button';
-import { Search, X, Loader2 } from 'lucide-react';
+import { Loader2, Search, X } from 'lucide-react';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useOnMount } from '@/hooks/useMountEffects';
 

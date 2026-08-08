@@ -4,10 +4,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   Cell, PieChart, Pie, Legend, LineChart, Line, AreaChart, Area 
 } from 'recharts';
-import { 
-  Activity, Users, Clock, Calendar, ShieldAlert, Gavel, 
-  TrendingUp, AlertTriangle, CheckCircle2, Zap, BrainCircuit, ShieldCheck
-} from 'lucide-react';
+import { Activity, AlertTriangle, BrainCircuit, Calendar, CheckCircle2, Clock, Gavel, ShieldAlert, ShieldCheck, TrendingUp, Users, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';

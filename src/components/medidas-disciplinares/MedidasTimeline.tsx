@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion } from 'framer-motion';
-import { FileWarning, Ban, Gavel, MessageSquare, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { Ban, CheckCircle2, Clock, FileWarning, Gavel, MessageSquare, XCircle } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 

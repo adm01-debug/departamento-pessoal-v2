@@ -21,19 +21,7 @@ import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import {
-  Plus,
-  ShieldCheck,
-  FileSearch,
-  Lock,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  Database,
-  Eye,
-  Clock,
-  Users,
-} from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, Database, Eye, FileSearch, Lock, Plus, ShieldCheck, Users, XCircle } from 'lucide-react';
 
 const statusColors: Record<string, string> = {
   pendente: 'bg-warning/15 text-warning border-0',

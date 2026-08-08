@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Landmark, FileText, CheckCircle2, AlertCircle, ExternalLink, Loader2, CloudSync, History } from 'lucide-react';
+import { AlertCircle, CheckCircle2, CloudSync, ExternalLink, FileText, History, Landmark, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';

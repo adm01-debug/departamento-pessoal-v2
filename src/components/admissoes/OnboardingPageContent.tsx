@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Rocket, CheckCircle2, Clock, UserPlus, Package, Mail, ListTodo, Loader2 } from 'lucide-react';
+import { CheckCircle2, Clock, ListTodo, Loader2, Mail, Package, Rocket, UserPlus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { Progress } from '@/components/ui/progress';

@@ -3,8 +3,7 @@ import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, FileSpreadsheet, History, Download, Zap, RefreshCcw, Table as TableIcon, Loader2, ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { BookOpen, Download, History, Loader2, RefreshCcw, Table as TableIcon, Zap } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { useOnMount } from '@/hooks/useMountEffects';
@@ -18,39 +17,29 @@ import { formatDate } from '@/utils/format';
 import { loggerService } from '@/services/loggerService';
 export default function ContabilidadePage() {
   const { empresaAtual } = useEmpresas();
-  /** Espelha `contabil_lancamentos` (campos opcionais = nem sempre projetados) */
   interface Lancamento {
     id: string;
-    data?: string;
+    data: string;
     data_lancamento?: string;
-    descricao?: string;
-    valor?: number;
-    tipo?: string;
-    status?: string;
-    /** join com plano de contas */
-    conta_debito?: { codigo?: string; nome?: string } | null;
-    conta_credito?: { codigo?: string; nome?: string } | null;
+    descricao: string;
+    valor: number;
+    tipo: string;
   }
-  /** Espelha `contabil_plano_contas` */
   interface PlanoConta {
     id: string;
-    codigo?: string;
-    descricao?: string;
-    nome?: string;
-    tipo?: string;
-    natureza?: string;
+    codigo: string;
+    descricao: string;
   }
-  /** Resumo de folha para seleção */
-  interface FolhaResumo {
+  interface FolhaRecord {
     id: string;
     competencia?: string;
     total?: number;
     status?: string;
+    [key: string]: unknown;
   }
-
   const [lancamentos, setLancamentos] = useState<Lancamento[]>([]);
   const [planoContas, setPlanoContas] = useState<PlanoConta[]>([]);
-  const [folhas, setFolhas] = useState<FolhaResumo[]>([]);
+  const [folhas, setFolhas] = useState<FolhaRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [selectedFolha, setSelectedFolha] = useState('');

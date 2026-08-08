@@ -5,10 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  Bot, Send, Loader2, Sparkles, Calculator,
-  Calendar, FileText, Scale, HelpCircle, Trash2, WifiOff, AlertCircle
-} from 'lucide-react';
+import { AlertCircle, Bot, Calculator, Calendar, FileText, HelpCircle, Loader2, Scale, Send, Sparkles, Trash2, WifiOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';

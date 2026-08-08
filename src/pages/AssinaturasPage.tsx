@@ -6,10 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  PenTool, FileText, CheckCircle2, Clock, AlertCircle, Search,
-  Send, Eye, Download, XCircle, Users, RefreshCw
-} from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, Download, Eye, FileText, PenTool, RefreshCw, Search, Send, Users, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAssinaturas } from '@/hooks/useAssinaturas';
 

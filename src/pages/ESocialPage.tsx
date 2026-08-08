@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileCheck, Send, AlertCircle, CheckCircle, Plus, Loader2, RefreshCw, ShieldCheck, Key, Eye, Info, Globe, AlertTriangle, Check, Search, Download, LayoutDashboard, History, Settings2, ShieldAlert, BarChart3, Calendar, Trash2 } from 'lucide-react';
+import { AlertCircle, AlertTriangle, BarChart3, Calendar, Check, CheckCircle, Download, Eye, FileCheck, Globe, History, Info, Key, LayoutDashboard, Loader2, Plus, RefreshCw, Search, Send, Settings2, ShieldAlert, ShieldCheck, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useESocial } from '@/hooks/useESocial';
@@ -30,7 +30,6 @@ import { ESocialTimeline } from '@/components/esocial/ESocialTimeline';
 import { ESocialAuditDialog } from '@/components/esocial/ESocialAuditDialog';
 import { ESocialLogsTab, ESocialConfigTab, ESocialEventDetailsDialog } from '@/components/esocial/tabs';
 import { currentCompetenciaLocal } from '@/utils/dateLocal';
-import type { UiRecord } from '@/types/uiRecord';
 
 
 const tiposEvento = [
@@ -49,7 +48,7 @@ export default function ESocialPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [novoTipo, setNovoTipo] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedEvento, setSelectedEvento] = useState<UiRecord | null>(null);
+  const [selectedEvento, setSelectedEvento] = useState<Record<string, unknown> | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedCompetencia, setSelectedCompetencia] = useState(currentCompetenciaLocal());

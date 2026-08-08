@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { User, Mail, Save, Loader2, Camera, Phone, Briefcase, Building2, Lock, ShieldCheck, History, Bell, Smartphone, Monitor } from 'lucide-react';
+import { Bell, Briefcase, Building2, Camera, History, Loader2, Lock, Mail, Monitor, Phone, Save, ShieldCheck, Smartphone, User } from 'lucide-react';
 import { pushNotificationService } from '@/services/pushNotificationService';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';

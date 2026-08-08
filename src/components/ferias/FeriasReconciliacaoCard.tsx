@@ -8,7 +8,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { GitCompareArrows, AlertCircle, MailWarning } from 'lucide-react';
+import { AlertCircle, GitCompareArrows, MailWarning } from 'lucide-react';
 import { useReconciliacaoFolha, type SituacaoReconciliacao } from '@/hooks/ferias/useReconciliacaoFolha';
 
 const meta: Record<SituacaoReconciliacao, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; Icon: typeof AlertCircle }> = {

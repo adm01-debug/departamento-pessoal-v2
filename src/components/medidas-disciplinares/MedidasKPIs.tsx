@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion } from 'framer-motion';
-import { AlertTriangle, FileWarning, Ban, Gavel, TrendingUp, TrendingDown, Clock } from 'lucide-react';
+import { AlertTriangle, Ban, Clock, FileWarning, Gavel, TrendingDown, TrendingUp } from 'lucide-react';
 
 interface MedidasStats {
   total: number;

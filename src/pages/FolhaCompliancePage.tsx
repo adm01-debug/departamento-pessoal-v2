@@ -18,7 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Download, ShieldCheck, Loader2, FileSearch } from 'lucide-react';
+import { Download, FileSearch, Loader2, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { MetricasFolhaDashboard } from '@/components/folha/MetricasFolhaDashboard';

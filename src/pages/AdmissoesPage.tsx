@@ -10,7 +10,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { EmptyList, EmptySearch } from '@/components/ui/empty-state';
 import { NovaAdmissaoDialog } from '@/components/admissoes/NovaAdmissaoDialog';
 import { DetalhesAdmissaoDialog } from '@/components/admissoes/DetalhesAdmissaoDialog';
-import { UserPlus, Search, ExternalLink, Mail, MessageSquare, Send, LayoutDashboard, List, History, Rocket, Kanban } from 'lucide-react';
+import { ExternalLink, History, Kanban, LayoutDashboard, List, Mail, MessageSquare, Rocket, Search, Send, UserPlus } from 'lucide-react';
 import { AdmissoesKanban } from '@/components/admissoes/AdmissoesKanban';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';

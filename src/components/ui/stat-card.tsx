@@ -1,7 +1,7 @@
 // V15-182: src/components/ui/stat-card.tsx
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
-import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
+import { LucideIcon, TrendingDown, TrendingUp } from 'lucide-react';
 
 interface StatCardProps {
   title: string;

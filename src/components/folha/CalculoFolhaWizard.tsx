@@ -14,11 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { 
-  Calculator, CheckCircle2, Clock, 
-  AlertTriangle, ArrowRight, Loader2,
-  FileText, Landmark, Download
-} from 'lucide-react';
+import { AlertTriangle, ArrowRight, Calculator, CheckCircle2, Clock, Download, FileText, Landmark, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';

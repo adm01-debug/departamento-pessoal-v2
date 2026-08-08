@@ -4,7 +4,7 @@ import { useEmpresas } from '@/hooks/useEmpresas';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
-import { AlertTriangle, CheckCircle2, Clock, ShieldAlert, Stethoscope, HardHat, CalendarClock, Users, Gauge } from 'lucide-react';
+import { AlertTriangle, CalendarClock, CheckCircle2, Clock, Gauge, HardHat, ShieldAlert, Stethoscope, Users } from 'lucide-react';
 
 interface DashboardData {
   asos: { vencidos: number; vencendo_30: number; vencendo_60: number; vencendo_90: number; validos: number; total: number };

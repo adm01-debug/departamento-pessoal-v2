@@ -14,7 +14,7 @@ import { feriasService, auditoriaService } from '@/services';
 import { useFeriasAprovacao } from '@/hooks/useFeriasAprovacao';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { useDataAccessLog } from '@/hooks/useDataAccessLog';
-import { Calendar, Calculator, Loader2, List, CalendarDays, History, LayoutDashboard, FileDown, RefreshCw, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { Calculator, Calendar, CalendarDays, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, FileDown, History, LayoutDashboard, List, Loader2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -27,7 +27,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CalendarioFerias } from '@/components/ferias/CalendarioFerias';
 import { GerenciamentoPeriodos } from '@/components/ferias/GerenciamentoPeriodos';
 import { calculoFerias } from '@/utils/calculoFerias';
-import type { UiRecord } from '@/types/uiRecord';
 const statusOptions = [
   { value: 'pendente', label: 'Pendente' },
   { value: 'aprovada', label: 'Aprovada' },
@@ -47,7 +46,7 @@ export default function FeriasPage() {
   const [calcLoading, setCalcLoading] = useState(false);
   const [syncLoading, setSyncLoading] = useState(false);
   const [calcForm, setCalcForm] = useState({ salario: '', diasFerias: '30', diasAbono: '0' });
-  const [calcResult, setCalcResult] = useState<UiRecord | null>(null);
+  const [calcResult, setCalcResult] = useState<Record<string, unknown> | null>(null);
   const queryClient = useQueryClient();
   
   const { ferias, totalCount, isLoading, refetch } = useFerias({

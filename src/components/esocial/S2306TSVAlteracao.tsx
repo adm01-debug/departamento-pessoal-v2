@@ -1,6 +1,6 @@
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { User, Calendar, FileEdit, Tag } from 'lucide-react';
+import { Calendar, FileEdit, Tag, User } from 'lucide-react';
 import { maskCpfDisplay } from '@/utils/piiMask';
 
 export function S2306TSVAlteracao({ dados }: { dados: any }) {

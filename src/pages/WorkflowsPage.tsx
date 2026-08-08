@@ -20,7 +20,7 @@ import { WorkflowDesigner } from '@/components/workflows/WorkflowDesigner';
 import { useEmpresas } from '@/hooks';
 import { formatDateTime } from '@/utils/format';
 import { toast } from 'sonner';
-import { Plus, GitBranch, Play, CheckCircle, XCircle, Clock, Trash2, Workflow, AlertTriangle, Timer, History, Zap, Mail, Bell, ArrowRight } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Bell, CheckCircle, Clock, GitBranch, History, Mail, Play, Plus, Timer, Trash2, Workflow, XCircle, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { LooseRow } from '@/types/db';

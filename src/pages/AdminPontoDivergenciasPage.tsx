@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { AlertTriangle, CheckCircle2, UserPlus, Clock, Ban, Loader2, Search, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Ban, CheckCircle2, Clock, Loader2, RefreshCw, Search, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
 import { formatDateTime } from '@/utils/format';

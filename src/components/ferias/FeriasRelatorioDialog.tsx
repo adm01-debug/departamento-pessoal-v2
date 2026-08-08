@@ -16,7 +16,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { FileDown, Eye, Loader2, Calendar } from 'lucide-react';
+import { Calendar, Eye, FileDown, Loader2 } from 'lucide-react';
 import { feriasPDF } from '@/utils/feriasPDF';
 import { format, subMonths, isAfter, isBefore } from 'date-fns';
 import { ptBR } from 'date-fns/locale';

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { loggerService } from '@/services/loggerService';
 import { useOnMount } from './useMountEffects';
 
 interface BeforeInstallPromptEvent extends Event {

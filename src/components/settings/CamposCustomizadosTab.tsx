@@ -13,7 +13,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
-import { Plus, Trash2, Edit2, GripVertical, CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, Edit2, GripVertical, Plus, Trash2, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { safeErrorMessage } from '@/utils/safeError';

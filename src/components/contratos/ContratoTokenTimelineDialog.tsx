@@ -2,10 +2,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  FileSignature, RefreshCw, Ban, CalendarPlus, Mail, MousePointerClick,
-  ShieldAlert, CheckCircle2, Clock, History,
-} from 'lucide-react';
+import { Ban, CalendarPlus, CheckCircle2, Clock, FileSignature, History, Mail, MousePointerClick, RefreshCw, ShieldAlert } from 'lucide-react';
 import { useContratoTokenTimeline, type ContratoTokenEvento } from '@/hooks/useContratoTokenTimeline';
 
 interface Props {

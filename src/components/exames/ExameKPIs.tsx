@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion } from 'framer-motion';
-import { Stethoscope, CheckCircle2, XCircle, AlertTriangle, Clock, ShieldAlert } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Clock, ShieldAlert, Stethoscope, XCircle } from 'lucide-react';
 import { isBefore, parseISO, addMonths } from 'date-fns';
 
 interface ExameKPIsProps {

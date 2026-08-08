@@ -12,11 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { 
-  Landmark, CheckCircle2, Loader2,
-  FileDown, Zap, Globe, Smartphone,
-  ArrowRight, ShieldCheck
-} from 'lucide-react';
+import { ArrowRight, CheckCircle2, FileDown, Globe, Landmark, Loader2, ShieldCheck, Smartphone, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';

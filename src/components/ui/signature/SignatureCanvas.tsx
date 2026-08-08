@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Eraser, Check, PenTool } from 'lucide-react';
+import { Check, Eraser, PenTool } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SignatureCanvasProps {

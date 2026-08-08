@@ -15,7 +15,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { FileSignature, ShieldCheck, ShieldAlert, Loader2 } from 'lucide-react';
+import { FileSignature, Loader2, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { currentCompetenciaLocal } from '@/utils/dateLocal';
 
 interface Props {

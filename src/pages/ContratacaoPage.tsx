@@ -14,22 +14,7 @@ import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
 import { loggerService } from '@/services/loggerService';
 import { useOnMount } from '@/hooks/useMountEffects';
-import {
-  FileText,
-  Upload,
-  CheckCircle2,
-  User,
-  PenTool,
-  ArrowRight,
-  ArrowLeft,
-  Loader2,
-  ShieldCheck,
-  MapPin,
-  Phone,
-  Mail,
-  Fingerprint,
-  Calendar,
-} from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, CheckCircle2, FileText, Fingerprint, Loader2, Mail, MapPin, PenTool, Phone, ShieldCheck, Upload, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CPFInput } from '@/components/ui/cpf-input';
 import { CEPInput, Address } from '@/components/ui/cep-input';
