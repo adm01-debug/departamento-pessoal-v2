@@ -3,7 +3,6 @@ import { useEmpresas } from './useEmpresas';
 import { batidasPontoService } from '@/services/batidasPontoService';
 import { faltasService } from '@/services/faltasService';
 import { medidasDisciplinaresService } from '@/services/medidasDisciplinaresService';
-import type { MedidaDisciplinarInsert } from '@/services/medidasDisciplinaresService';
 import { episService, episEntregasService } from '@/services/episService';
 import { jornadaHorariosService } from '@/services/jornadaHorariosService';
 import { bancoHorasConfigService } from '@/services/bancoHorasConfigService';
