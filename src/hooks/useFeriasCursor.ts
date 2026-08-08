@@ -14,8 +14,7 @@ import { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { feriasService } from '@/services';
 import { useEmpresas } from './useEmpresas';
-import { extractNextCursor } from '@/lib/cursor';
-import type { FeriasRow } from '@/types/pagination';
+import { encodeCursor, extractNextCursor, type FeriasRow } from '@/types/pagination';
 
 interface UseCursorPaginationOptions {
   limit?: number;
@@ -60,13 +59,13 @@ export function useFeriasCursor(options: UseCursorPaginationOptions = {}): UseCu
   });
 
   // Atualiza allData quando novos dados chegam
-  const newData = (query.data?.data ?? []) as FeriasRow[];
+  const newData = (query.data?.data ?? []) as unknown as FeriasRow[];
 
   // Combina dados existentes com novos (para scroll infinito)
   const combinedData = cursor === null ? newData : [...allData, ...newData];
 
   // Calcula próximo cursor
-  const nextCursor = extractNextCursor(newData as unknown as Record<string, unknown>[], 'id');
+  const nextCursor = extractNextCursor(newData, 'id');
   const hasMore = newData.length === limit && nextCursor !== null;
 
   const loadMore = useCallback(async () => {
@@ -85,7 +84,7 @@ export function useFeriasCursor(options: UseCursorPaginationOptions = {}): UseCu
     });
 
     // Adiciona aos dados existentes
-    setAllData(prev => [...prev, ...((result.data ?? []) as FeriasRow[])]);
+    setAllData(prev => [...prev, ...((result.data ?? []) as unknown as FeriasRow[])]);
     setIsLoadingMore(false);
   }, [nextCursor, isLoadingMore, empresaId, limit, options]);
 

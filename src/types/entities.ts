@@ -128,27 +128,3 @@ export interface Periodo {
   dataFim: string;
 }
 
-export type StatusPeriodoAquisitivo = 'aberto' | 'concluido' | 'cancelado';
-
-export interface PeriodoAquisitivo {
-  id: string;
-  empresa_id: string;
-  colaborador_id: string;
-  data_inicio: string;
-  data_fim: string;
-  dias_direito: number;
-  dias_usados: number;
-  dias_restantes: number;
-  status: StatusPeriodoAquisitivo;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface FeriasAprovacaoLog {
-  id: string;
-  ferias_id: string;
-  acao: 'aprovacao_gestor' | 'aprovacao_rh' | 'rejeicao' | 'cancelamento';
-  usuario_id: string | null;
-  observacao: string | null;
-  created_at: string;
-}
