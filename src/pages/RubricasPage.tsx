@@ -18,7 +18,7 @@ import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Plus, Edit2, Trash2, Hash, TrendingUp, TrendingDown, Info, CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, Edit2, Hash, Info, Plus, Trash2, TrendingDown, TrendingUp, XCircle } from 'lucide-react';
 
 type TipoEvento = 'provento' | 'desconto' | 'informativo';
 

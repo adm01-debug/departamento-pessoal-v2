@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { UserCheck, Shield, Building2, X, Ban, FileDown, FileSignature, Gift } from 'lucide-react';
+import { Ban, Building2, FileDown, FileSignature, Gift, Shield, UserCheck, X } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { feriasPDF } from '@/utils/feriasPDF';
 import { AssinarAvisoDialog } from './AssinarAvisoDialog';

@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmpresa } from '@/contexts';
-import { FileText, Download, Eye, Printer, FileSignature, ScrollText, Shield, UserCheck, Loader2, Sparkles } from 'lucide-react';
+import { Download, Eye, FileSignature, FileText, Loader2, Printer, ScrollText, Shield, Sparkles, UserCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';

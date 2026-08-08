@@ -1,12 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  Sun, Moon, Sunset, Gift, Calendar, AlertTriangle, 
-  CheckCircle2, Clock, UserPlus, UserMinus, FileText, 
-  ChevronRight, Sparkles, Coffee, Database, Zap,
-  Loader2, RefreshCw, Trash2, Bell, ShieldAlert
-} from 'lucide-react';
+import { AlertTriangle, Bell, Calendar, CheckCircle2, ChevronRight, Clock, Coffee, Database, FileText, Gift, Loader2, Moon, RefreshCw, ShieldAlert, Sparkles, Sun, Sunset, Trash2, UserMinus, UserPlus, Zap } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format, parseISO } from 'date-fns';

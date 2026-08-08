@@ -1,5 +1,5 @@
 import { BaseService, ListOptions, ListResponse } from './baseService';
-import { Ferias } from '@/types/entities';
+import { Ferias, FeriasAprovacaoLog, PeriodoAquisitivo } from '@/types/entities';
 import { supabase } from '@/integrations/supabase/client';
 import { parseCursor } from '@/lib/cursor';
 
@@ -107,28 +107,28 @@ class FeriasService extends BaseService<Ferias> {
     };
   }
 
-  async getAprovacoesLog(feriasId: string): Promise<any[]> {
+  async getAprovacoesLog(feriasId: string): Promise<FeriasAprovacaoLog[]> {
     const { data, error } = await (supabase as any)
       .from('ferias_aprovacoes_log')
       .select('*')
       .eq('ferias_id', feriasId)
       .order('created_at', { ascending: true });
-    
+
     if (error) throw error;
-    return data || [];
+    return (data ?? []) as FeriasAprovacaoLog[];
   }
 
-  async criarPeriodoAquisitivo(d: any): Promise<any> {
-    const { data, error } = await (supabase as any).from('periodos_aquisitivos').insert(d).select().maybeSingle();
+  async criarPeriodoAquisitivo(d: Omit<PeriodoAquisitivo, 'id' | 'created_at' | 'updated_at'>): Promise<PeriodoAquisitivo> {
+    const { data, error } = await (supabase as any).from('periodos_aquisitivos').insert(d as any).select().maybeSingle();
     if (error) throw error;
-    return data;
+    return data as PeriodoAquisitivo;
   }
 
-  async atualizarPeriodoAquisitivo(id: string, d: any, empresaId: string): Promise<any> {
+  async atualizarPeriodoAquisitivo(id: string, d: Partial<Omit<PeriodoAquisitivo, 'id' | 'created_at' | 'updated_at'>>, empresaId: string): Promise<PeriodoAquisitivo> {
     if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
-    const { data, error } = await (supabase as any).from('periodos_aquisitivos').update(d).eq('id', id).eq('empresa_id', empresaId).select().maybeSingle();
+    const { data, error } = await (supabase as any).from('periodos_aquisitivos').update(d as any).eq('id', id).eq('empresa_id', empresaId).select().maybeSingle();
     if (error) throw error;
-    return data;
+    return data as PeriodoAquisitivo;
   }
 
   async excluirPeriodoAquisitivo(id: string, empresaId: string): Promise<void> {
@@ -143,7 +143,7 @@ class FeriasService extends BaseService<Ferias> {
       enviado_contabilidade: true,
       enviado_contabilidade_em: new Date().toISOString(),
       enviado_contabilidade_por: userId || null,
-    } as any).eq('id', id).eq('empresa_id', empresaId);
+    } as Record<string, unknown>).eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   }
 
@@ -160,7 +160,7 @@ class FeriasService extends BaseService<Ferias> {
       aprovado_gestor: true,
       aprovado_gestor_em: new Date().toISOString(),
       aprovado_gestor_por: userId || null,
-    } as any).eq('id', id).eq('empresa_id', empresaId);
+    } as Record<string, unknown>).eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   }
 
@@ -172,11 +172,11 @@ class FeriasService extends BaseService<Ferias> {
       aprovado_rh_em: new Date().toISOString(),
       aprovado_rh_por: userId || null,
       status: 'aprovada',
-    } as any).eq('id', id).eq('empresa_id', empresaId);
+    } as Record<string, unknown>).eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   }
 
-  async listPeriodosAquisitivos(colaboradorId: string, empresaId: string): Promise<any[]> {
+  async listPeriodosAquisitivos(colaboradorId: string, empresaId: string): Promise<PeriodoAquisitivo[]> {
     if (!empresaId) throw new Error('empresa_id obrigatório para isolamento de tenant');
     const { data, error } = await (supabase as any)
       .from('periodos_aquisitivos')
@@ -185,7 +185,7 @@ class FeriasService extends BaseService<Ferias> {
       .eq('empresa_id', empresaId)
       .order('data_inicio', { ascending: false });
     if (error) throw error;
-    return data || [];
+    return (data ?? []) as PeriodoAquisitivo[];
   }
 
   async rejeitar(id: string, empresaId: string): Promise<void> {
@@ -201,7 +201,7 @@ class FeriasService extends BaseService<Ferias> {
       cancelado_em: new Date().toISOString(),
       cancelado_por: userId || null,
       status: 'cancelada',
-    } as any).eq('id', id).eq('empresa_id', empresaId);
+    } as Record<string, unknown>).eq('id', id).eq('empresa_id', empresaId);
     if (error) throw error;
   }
 }

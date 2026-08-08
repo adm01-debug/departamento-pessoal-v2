@@ -8,10 +8,7 @@ import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import {
-  Activity, Database, HardDrive, CheckCircle, XCircle, Trash2, Download,
-  RefreshCw, Loader2, Bell, Zap, Clock
-} from 'lucide-react';
+import { Activity, Bell, CheckCircle, Clock, Database, Download, HardDrive, Loader2, RefreshCw, Trash2, XCircle, Zap } from 'lucide-react';
 
 // P2-051 (batch 2026-07-26): tipos explícitos substituem `useState<any>` em todos
 // os estados do SystemHealthTab. Antes, qualquer typo em `result.foo` passava

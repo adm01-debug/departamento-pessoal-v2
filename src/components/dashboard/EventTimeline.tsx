@@ -1,10 +1,7 @@
 import { memo, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  UserPlus, UserMinus, Calendar, FileText, Clock, AlertTriangle, 
-  type LucideIcon, Filter, ArrowUpDown, ShieldCheck, MapPin, Globe
-} from 'lucide-react';
+import { AlertTriangle, ArrowUpDown, Calendar, Clock, FileText, Filter, Globe, LucideIcon, MapPin, ShieldCheck, UserMinus, UserPlus } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';

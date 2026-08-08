@@ -3,8 +3,7 @@ import { PageLayout } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Landmark, FileDown, History, Settings, CheckCircle, AlertCircle, Loader2, Download, Plus, Banknote, Globe, Upload } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { CheckCircle, Download, FileDown, Globe, History, Landmark, Loader2, Plus, Settings, Upload } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { useEmpresas } from '@/hooks/useEmpresas';
 import { useOnMount } from '@/hooks/useMountEffects';
@@ -23,44 +22,37 @@ import { formatDate } from '@/utils/format';
 export default function FinanceiroBancarioPage() {
   const { empresaAtual } = useEmpresas();
   const [config, setConfig] = useState<CNABConfig | null>(null);
-  /** Espelha `cnab_remessas` (campos opcionais = nem sempre selecionados) */
   interface Remessa {
     id: string;
-    empresa_id?: string;
+    arquivo: string;
+    data: string;
+    tipo: string;
+    status: string;
+    arquivo_url?: string | null;
     banco_codigo?: string;
+    created_at?: string | null;
+    data_geracao?: string | null;
+    empresa_id?: string;
+    hash_integridade?: string | null;
     sequencial_arquivo?: number;
-    total_pagamentos?: number;
-    valor_total?: number;
-    arquivo_url?: string;
-    hash_integridade?: string;
-    data_geracao?: string;
-    created_at?: string;
-    updated_at?: string;
-    status?: string;
+    total_pagamentos?: number | null;
+    updated_at?: string | null;
+    valor_total?: number | null;
   }
-  /** Espelha `pix_lotes` */
   interface PixLote {
     id: string;
-    empresa_id?: string;
-    quantidade_pagamentos?: number;
-    valor_total?: number;
-    data_criacao?: string;
-    created_at?: string;
-    updated_at?: string;
-    status?: string;
+    valor: number;
+    quantidade: number;
+    data: string;
   }
-  /** Resumo de folha usado apenas para seleção/exibição */
   interface FolhaResumo {
     id: string;
-    competencia?: string;
-    total?: number;
-    tipo?: string;
+    competencia: string;
+    total: number;
   }
-
   const [remessas, setRemessas] = useState<Remessa[]>([]);
   const [pixLotes, setPixLotes] = useState<PixLote[]>([]);
   const [folhas, setFolhas] = useState<FolhaResumo[]>([]);
-  const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [processingRetorno, setProcessingRetorno] = useState(false);
   const [selectedFolha, setSelectedFolha] = useState('');
@@ -70,7 +62,6 @@ export default function FinanceiroBancarioPage() {
   const loadData = useCallback(async () => {
     if (!empresaAtual?.id) return;
     try {
-      setLoading(true);
       const [conf, rem, pix, fls] = await Promise.all([
         cnabService.getConfig(empresaAtual.id),
         cnabService.listRemessas(empresaAtual.id),
@@ -84,8 +75,6 @@ export default function FinanceiroBancarioPage() {
     } catch (error) {
       loggerService.error('Erro ao carregar dados bancários', { empresaId: empresaAtual?.id }, error instanceof Error ? error : new Error(String(error)));
       toast.error('Erro ao carregar dados bancários');
-    } finally {
-      setLoading(false);
     }
   }, [empresaAtual?.id]);
 

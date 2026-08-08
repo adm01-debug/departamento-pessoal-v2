@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Gift, Calculator, Loader2 } from 'lucide-react';
+import { Calculator, Gift, Loader2 } from 'lucide-react';
 import { useCalcular13Salario } from '@/hooks/useCalcular13Salario';
 
 function formatCurrency(value: number): string {

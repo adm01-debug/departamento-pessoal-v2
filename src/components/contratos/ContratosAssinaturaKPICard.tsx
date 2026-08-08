@@ -3,9 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  TrendingUp, FileSignature, Clock, XCircle, CheckCircle2, Mail, RefreshCw, Ban, CalendarPlus, History,
-} from 'lucide-react';
+import { Ban, CalendarPlus, CheckCircle2, Clock, FileSignature, History, Mail, RefreshCw, TrendingUp, XCircle } from 'lucide-react';
 import { useContratosAssinaturaKPI } from '@/hooks/useContratosAssinaturaKPI';
 import { ContratoTokenTimelineDialog } from './ContratoTokenTimelineDialog';
 

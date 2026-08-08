@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { turnoService } from '@/services/turnoService';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
-import { Plus, CalendarClock, Clock, Users, Trash2 } from 'lucide-react';
+import { CalendarClock, Clock, Plus, Trash2, Users } from 'lucide-react';
 
 export default function TurnosPage() {
   const { empresaAtual } = useEmpresas();

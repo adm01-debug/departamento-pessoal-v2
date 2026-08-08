@@ -2,7 +2,7 @@ import { PageTitle } from '@/components/PageTitle';
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Upload, Calculator, RefreshCw, Shield, Loader2, Banknote, Lock, History } from 'lucide-react';
+import { Banknote, Calculator, History, Loader2, Lock, RefreshCw, Shield, Upload } from 'lucide-react';
 import { edgeFunctionsService } from '@/services/edgeFunctionsService';
 import { PageLayout } from '@/components/layout';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';

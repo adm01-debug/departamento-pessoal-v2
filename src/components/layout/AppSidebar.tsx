@@ -1,12 +1,4 @@
-import { 
-  LayoutDashboard, Users, UserPlus, Clock, Umbrella, Heart, Wallet, Gift,
-  UserMinus, BarChart3, ChevronLeft, ChevronRight, ChevronDown, Search,
-  LogOut, History, Calendar, Building2, Shield, PenTool, UserCircle,
-  Network, ClipboardList, FileCheck, Calculator, Settings, Briefcase,
-  FileText, GraduationCap, Target, UserSearch, LucideIcon, MapPin, Timer,
-  Megaphone, Receipt, GitBranch, CalendarClock, Fingerprint, ShieldCheck, Scale, Bot, Landmark, BookOpen, TrendingDown,
-  Trophy, MessageSquareText, Activity, ShieldAlert
-} from 'lucide-react';
+import { Activity, BarChart3, BookOpen, Bot, Briefcase, Building2, Calculator, Calendar, CalendarClock, ChevronDown, ChevronLeft, ChevronRight, ClipboardList, Clock, FileCheck, FileText, Fingerprint, Gift, GitBranch, GraduationCap, Heart, History, Landmark, LayoutDashboard, LogOut, LucideIcon, MapPin, Megaphone, MessageSquareText, Network, PenTool, Receipt, Scale, Search, Settings, Shield, ShieldAlert, ShieldCheck, Target, Timer, TrendingDown, Trophy, Umbrella, UserCircle, UserMinus, UserPlus, UserSearch, Users, Wallet } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';

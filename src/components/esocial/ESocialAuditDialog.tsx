@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ShieldAlert, CheckCircle, AlertTriangle, Loader2, Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, ArrowRight, CheckCircle, Loader2, ShieldAlert, ShieldCheck, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ESocialEvento } from '@/services/esocialService';
 import { Progress } from '@/components/ui/progress';

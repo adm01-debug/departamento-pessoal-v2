@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, DollarSign, PenTool, Upload, ChevronRight, CheckCircle2, AlertCircle, File, Loader2, Download, Eye, Trash2, Check, Eraser } from 'lucide-react';
+import { AlertCircle, Check, CheckCircle2, ChevronRight, DollarSign, Download, Eraser, Eye, File, FileText, Loader2, PenTool, Trash2, Upload } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { documentoService } from '@/services';
 import { supabase } from '@/integrations/supabase/client';

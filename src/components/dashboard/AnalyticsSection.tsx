@@ -1,16 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import {
-  TrendingUp, Activity, Timer, PieChart,
-  AlertCircle, UserPlus, UserMinus, Briefcase,
-  CheckCircle2, AlertTriangle, Calendar, ChevronRight,
-  TrendingDown, Minus, ShieldCheck, Clock, Search, Filter, X,
-  Check, Eye, Forward, MoreHorizontal, History, XCircle, ChevronLeft, MapPin, Shield,
-  Download, ListChecks, CheckCircle, AlertOctagon, Bell, ExternalLink, FileJson,
-  Layers, Database, BarChart3, Target, Zap, Scale
-} from 'lucide-react';
+import { Activity, AlertCircle, AlertOctagon, Bell, Briefcase, Calendar, Check, CheckCircle, CheckCircle2, ChevronLeft, ChevronRight, Clock, Database, Download, ExternalLink, Eye, FileJson, Forward, History, Layers, ListChecks, MapPin, MoreHorizontal, PieChart, Scale, Search, Shield, ShieldCheck, Target, TrendingUp, UserMinus, UserPlus, X, XCircle, Zap } from 'lucide-react';
 import { MiniSparkline } from './MiniSparkline';
 import { useNavigate } from 'react-router-dom';
 import { AnimatedNumber } from './AnimatedNumber';
@@ -18,8 +10,7 @@ import { BarChartWidget } from './BarChartWidget';
 import { DonutChart } from './DonutChart';
 import { Badge } from '@/components/ui/badge';
 import { CardSkeleton } from '@/components/ui/module-skeleton';
-import { viewsService } from '@/services/tabelasComplementaresService';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { 

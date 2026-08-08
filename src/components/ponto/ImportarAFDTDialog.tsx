@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileUp, Loader2, CheckCircle2, AlertTriangle, GitCompare } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, FileUp, GitCompare, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
 import { supabase } from '@/integrations/supabase/client';

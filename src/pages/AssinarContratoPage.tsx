@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CheckCircle2, ShieldCheck, FileSignature, AlertTriangle, Ban, Clock, RotateCcw, FileText } from 'lucide-react';
+import { AlertTriangle, Ban, CheckCircle2, Clock, FileSignature, FileText, RotateCcw, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import { loggerService } from '@/services/loggerService';
@@ -295,7 +295,7 @@ export default function AssinarContratoPage() {
                   });
                   toast.success('Recibo baixado');
                 } catch (e) {
-                  loggerService.error('Erro ao gerar PDF do recibo', { hash: assinado.hash }, e instanceof Error ? e : new Error(String(e)));
+                  loggerService.error('Erro ao gerar PDF do recibo', { contratoId }, e instanceof Error ? e : new Error(String(e)));
                   toast.error('Falha ao gerar recibo');
                 }
               }}

@@ -18,10 +18,7 @@ import { Empresa } from '@/types/entities';
 import { empresaSchema, type EmpresaSchema, type EmpresaSchemaInput } from '@/schemas';
 
 import { useNotification } from '@/contexts';
-import { 
-  Building2, MapPin, Phone, Mail, 
-  ArrowLeft, Save, Loader2, Camera, ShieldCheck
-} from 'lucide-react';
+import { ArrowLeft, Building2, Camera, Loader2, Mail, MapPin, Phone, Save, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';

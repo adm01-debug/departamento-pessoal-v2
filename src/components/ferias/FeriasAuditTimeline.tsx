@@ -2,17 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { auditoriaService, feriasService } from '@/services';
 import { useEmpresas } from '@/hooks/useEmpresas';
-import { 
-  CheckCircle2, 
-  Clock, 
-  User, 
-  Building2, 
-  Shield, 
-  History,
-  Loader2,
-  XCircle,
-  Check
-} from 'lucide-react';
+import { Building2, Check, CheckCircle2, Clock, History, Loader2, Shield, User, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ScrollArea } from '@/components/ui/scroll-area';

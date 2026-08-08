@@ -18,7 +18,7 @@ import { colaboradorService } from '@/services';
 import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
-import { Plus, ArrowRightLeft, TrendingUp, MapPin, Trash2 } from 'lucide-react';
+import { ArrowRightLeft, MapPin, Plus, Trash2, TrendingUp } from 'lucide-react';
 
 export default function MovimentacoesPage() {
   const { empresaAtual } = useEmpresas();

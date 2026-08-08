@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { FileCheck, Clock, ShieldCheck, XCircle, Inbox, Archive, Stethoscope } from 'lucide-react';
+import { Archive, Clock, FileCheck, Inbox, ShieldCheck, Stethoscope, XCircle } from 'lucide-react';
 
 type StatusAso = 'rascunho' | 'emitido_clinica' | 'recebido_rh' | 'validado' | 'arquivado' | 'cancelado';
 

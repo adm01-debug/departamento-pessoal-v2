@@ -5,12 +5,24 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { TrendingUp, Calculator, Loader2, Save, History, PieChart } from 'lucide-react';
+import { Calculator, History, Loader2, PieChart, Save, TrendingUp } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
 import { useEmpresas } from '@/hooks/useEmpresas';
-import type { UiRecord } from '@/types/uiRecord';
+interface ResultadoSimulacao {
+  salario: number;
+  totalEncargos: number;
+  totalProvisoes: number;
+  beneficios: number;
+  custoTotal: number;
+  multiplicador: number;
+  breakdown: {
+    inss: number; fgts: number; rat: number; terceiros: number;
+    provisaoFerias: number; provisao13: number; encargosProvisoes: number;
+  };
+}
+
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 }).format(value);
 }
@@ -32,7 +44,7 @@ export function SimuladorWhatIf() {
     planoSaude: '350',
   });
 
-  const [resultado, setResultado] = useState<UiRecord | null>(null);
+  const [resultado, setResultado] = useState<ResultadoSimulacao | null>(null);
 
   const calcularImpacto = () => {
     setLoading(true);
@@ -64,7 +76,7 @@ export function SimuladorWhatIf() {
       totalProvisoes,
       beneficios,
       custoTotal,
-      multiplicador: (custoTotal / salario).toFixed(2),
+      multiplicador: Number((custoTotal / salario).toFixed(2)),
       breakdown: {
         inss, fgts, rat, terceiros, provisaoFerias, provisao13, encargosProvisoes
       }

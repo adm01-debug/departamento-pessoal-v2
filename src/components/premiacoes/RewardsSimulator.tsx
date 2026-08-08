@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calculator, TrendingUp, Save, History, RefreshCw, Zap, PieChart as PieChartIcon, BarChart as BarChartIcon, Copy, Trash2, ArrowRightLeft } from 'lucide-react';
+import { ArrowRightLeft, BarChart as BarChartIcon, Calculator, Copy, History, PieChart as PieChartIcon, RefreshCw, Save, Trash2, TrendingUp, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts';
 import { premiacoesService } from '@/services/premiacoesService';

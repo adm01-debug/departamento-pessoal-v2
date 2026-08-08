@@ -6,7 +6,7 @@ import { useOnMount } from '@/hooks/useMountEffects';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Activity, CheckCircle2, XCircle, Loader2, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Activity, AlertTriangle, CheckCircle2, Loader2, RefreshCw, XCircle } from 'lucide-react';
 import { useSystemHealthHistory } from '@/hooks/useSystemHealthHistory';
 import { bitrixBreaker, resendBreaker, genericBreaker } from '@/lib/circuitBreaker';
 

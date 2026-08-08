@@ -2,11 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import {
-  UserCircle, Calendar, Clock, FileText, DollarSign,
-  ChevronRight, Bell, CheckCircle2, AlertCircle, Edit,
-  Gift, Megaphone, Bot, PenTool
-} from 'lucide-react';
+import { AlertCircle, Bell, Bot, Calendar, CheckCircle2, ChevronRight, Clock, DollarSign, Edit, FileText, Gift, Megaphone, PenTool, UserCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { format, parseISO } from 'date-fns';

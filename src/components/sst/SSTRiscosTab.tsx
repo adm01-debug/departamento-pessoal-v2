@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Activity, AlertTriangle, Flame, Users, Loader2 } from 'lucide-react';
+import { Activity, AlertTriangle, Flame, Loader2, Users } from 'lucide-react';
 import { Stethoscope } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';

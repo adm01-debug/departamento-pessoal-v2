@@ -17,7 +17,7 @@ import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
 import { safeHref } from '@/utils/safeUrl';
-import { MessageSquare, Plus, Send, Paperclip, CheckCircle2, Archive, UserPlus, ExternalLink, Inbox } from 'lucide-react';
+import { Archive, CheckCircle2, ExternalLink, Inbox, MessageSquare, Paperclip, Plus, Send, UserPlus } from 'lucide-react';
 import { formatDateTime } from '@/utils/format';
 
 const categoriaLabels: Record<ThreadCategoria, string> = {

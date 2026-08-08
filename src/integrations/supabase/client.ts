@@ -12,6 +12,11 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY =
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Em dev local, VITE_SUPABASE_FUNCTIONS_BASE=/functions/v1 faz a bridge passar
+// pelo proxy do Vite (que remove o header Origin, permitido pelo gate estrito
+// da edge function). Em produção, fica vazio → URL absoluta do Supabase.
+const FUNCTIONS_BASE = import.meta.env.VITE_SUPABASE_FUNCTIONS_BASE?.trim() || `${SUPABASE_URL}/functions/v1`;
+
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
   throw new Error(
     '[SUPABASE] VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY (ou VITE_SUPABASE_ANON_KEY) ' +
@@ -167,7 +172,7 @@ const callBridge = async <T = any>(
   try {
     // P3-061: retry com backoff para writes; idempotency key auto-injetada.
     const { res, idempotencyKey } = await fetchWithRetry(
-      `${SUPABASE_URL}/functions/v1/external-db-bridge`,
+      `${FUNCTIONS_BASE}/external-db-bridge`,
       {
         method: 'POST',
         headers: {

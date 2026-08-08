@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { FileDown, Settings2, Loader2, Landmark, CheckCircle2, Zap, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, FileDown, Landmark, Loader2, Settings2, ShieldCheck, Zap } from 'lucide-react';
 import { cnabService, CNABConfig } from '@/services/cnabService';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';

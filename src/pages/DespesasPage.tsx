@@ -18,7 +18,7 @@ import { useEmpresas } from '@/hooks';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
 import { safeHref } from '@/utils/safeUrl';
-import { Plus, Receipt, DollarSign, CheckCircle, Clock, XCircle, Trash2, Upload, Eye, DollarSign as DollarIcon } from 'lucide-react';
+import { CheckCircle, Clock, DollarSign, DollarSign as DollarIcon, Eye, Plus, Receipt, Trash2, Upload, XCircle } from 'lucide-react';
 import { formatCurrency } from '@/utils/format';
 
 const statusColors: Record<DespesaStatus, string> = {

@@ -8,20 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Clock,
-  MapPin,
-  RefreshCw,
-  Loader2,
-  AlertCircle,
-  Settings,
-  WifiOff,
-  ShieldCheck,
-  Zap,
-  BrainCircuit,
-  BarChart3,
-  Map as MapIcon,
-} from 'lucide-react';
+import { AlertCircle, BarChart3, BrainCircuit, Clock, Loader2, Map as MapIcon, MapPin, RefreshCw, Settings, ShieldCheck, WifiOff, Zap } from 'lucide-react';
 import { pontoService, batidasPontoService } from '@/services';
 import { useAuth } from '@/contexts';
 import { useEmpresas, usePontoOffline } from '@/hooks';
@@ -275,7 +262,7 @@ export default function PontoPage() {
           }
           return { biometriaValida: !!bio?.valid };
         } catch (bioErr) {
-          loggerService.error('Erro na validação biométrica', { colaboradorId: colab.id, batidaId: batida.id }, bioErr instanceof Error ? bioErr : new Error(String(bioErr)));
+          loggerService.error('Erro na validação biométrica', { colaboradorId }, bioErr instanceof Error ? bioErr : new Error(String(bioErr)));
           toast.warning('Não foi possível validar a biometria agora — ponto registrado, revisão pendente.');
           return { biometriaValida: undefined };
         }

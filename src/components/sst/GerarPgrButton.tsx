@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogT
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Loader2, Download, ShieldCheck } from 'lucide-react';
+import { Download, FileText, Loader2, ShieldCheck } from 'lucide-react';
 
 interface Programa {
   id: string;

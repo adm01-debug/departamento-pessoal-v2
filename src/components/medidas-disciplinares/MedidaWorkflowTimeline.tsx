@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion } from 'framer-motion';
-import { GitBranch, CheckCircle2, XCircle, MessageSquareWarning, Send, Archive, Gavel, ShieldCheck } from 'lucide-react';
+import { Archive, CheckCircle2, Gavel, GitBranch, MessageSquareWarning, Send, ShieldCheck, XCircle } from 'lucide-react';
 
 const acaoConfig: Record<string, { label: string; Icon: typeof GitBranch; className: string }> = {
   enviar_aprovacao: { label: 'Enviada para aprovação', Icon: Send, className: 'bg-primary/15 text-primary border-primary/30' },

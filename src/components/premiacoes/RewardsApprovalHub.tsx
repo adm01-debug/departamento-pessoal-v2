@@ -3,25 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { 
-  ShieldCheck, 
-  CheckCircle2, 
-  XCircle, 
-  Clock, 
-  User, 
-  AlertCircle, 
-  MessageSquare, 
-  Search,
-  Check,
-  AlertTriangle,
-  RefreshCw
-} from 'lucide-react';
+import { AlertCircle, AlertTriangle, Check, CheckCircle2, Clock, MessageSquare, RefreshCw, Search, ShieldCheck, User, XCircle } from 'lucide-react';
 import { premiacoesService } from '@/services/premiacoesService';
 import { toast } from 'sonner';
 import { safeErrorMessage } from '@/utils/safeError';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEmpresas } from '@/hooks';
-import type { UiRecord } from '@/types/uiRecord';
 import {
   Dialog,
   DialogContent,
@@ -37,7 +24,7 @@ interface ApprovalHubProps {
 export function RewardsApprovalHub({ pagamentos }: ApprovalHubProps) {
   const queryClient = useQueryClient();
   const { empresaAtual } = useEmpresas();
-  const [selectedPagamento, setSelectedPagamento] = React.useState<UiRecord | null>(null);
+  const [selectedPagamento, setSelectedPagamento] = React.useState<Record<string, unknown> | null>(null);
   const [comentario, setComentario] = React.useState('');
   const [isReconcileOpen, setIsReconcileOpen] = React.useState(false);
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = React.useState(false);

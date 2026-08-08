@@ -17,10 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { colaboradorService } from '@/services';
 import { useNotification } from '@/contexts';
-import { 
-  User, MapPin, Landmark, Briefcase, 
-  FileText, ArrowLeft, Save, Loader2, Camera
-} from 'lucide-react';
+import { ArrowLeft, Briefcase, Camera, FileText, Landmark, Loader2, MapPin, Save, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
